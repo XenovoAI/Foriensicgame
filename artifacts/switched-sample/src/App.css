@@ -1,12 +1,144 @@
 :root {
-  --ink: #e9e7de;
-  --muted: #858b91;
-  --line: rgba(202, 212, 217, .13);
-  --panel: #171c20;
-  --panel-raised: #1c2327;
-  --mint: #8bc8ac;
-  --amber: #d5b878;
-  --danger: #dc8276;
+  --ink: #f0eee4;
+  --muted: #a0aba8;
+  --line: rgba(189, 204, 199, .16);
+  --panel: #151d20;
+  --panel-raised: #1b2527;
+  --mint: #a1d0b5;
+  --amber: #d9bb7d;
+  --danger: #e39a8d;
+}
+
+/* Crime-scene accents: warning tape, evidence red, and warm marker yellow. */
+:root {
+  --mint: #edc65b;
+  --amber: #df655a;
+  --danger: #f08d7a;
+}
+
+.welcome-hero {
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, rgba(12, 16, 18, .97) 0%, rgba(12, 16, 18, .82) 43%, rgba(12, 16, 18, .2) 100%),
+    linear-gradient(0deg, rgba(12, 16, 18, .48), transparent 53%),
+    url("/lab-evidence.jpg") 67% center / cover,
+    #151719;
+}
+.welcome-hero::before {
+  content: "CRIME SCENE  •  KEEP OUT";
+  position: absolute;
+  z-index: 2;
+  top: 75px;
+  right: -83px;
+  width: 350px;
+  padding: 7px 12px;
+  transform: rotate(31deg);
+  border-block: 1px solid rgba(14, 16, 15, .8);
+  background: repeating-linear-gradient(135deg, #edc65b 0 16px, #171918 16px 32px);
+  color: #111514;
+  text-align: center;
+  font: 700 8px/1 var(--app-font-mono);
+  letter-spacing: .16em;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .3);
+}
+.welcome-hero > .hero-content { z-index: 3; }
+.welcome-hero::after {
+  opacity: .26;
+  background: linear-gradient(135deg, transparent 55%, rgba(223, 101, 90, .16));
+}
+.hero-title-wrap h1 em,.solved-card h1 em { color: #edc65b; }
+.hero-kicker,.solved-kicker { color: #f08370; }
+.hero-stats b { color: #edc65b; }
+.hero-stamp { border-color: rgba(223, 101, 90, .7); color: #f08370; }
+.topbar { border-top: 3px solid transparent; border-image: repeating-linear-gradient(135deg, #edc65b 0 12px, #171918 12px 24px) 1; }
+.case-rail { position: relative; }
+.case-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: repeating-linear-gradient(135deg, #edc65b 0 9px, #171918 9px 18px);
+  opacity: .8;
+}
+.case-stamp {
+  background: rgba(223, 101, 90, .12);
+  border-color: rgba(223, 101, 90, .7);
+  color: #f08370;
+}
+.step-item.is-active {
+  border-color: rgba(223, 101, 90, .42);
+  background: linear-gradient(90deg, rgba(223, 101, 90, .13), rgba(223, 101, 90, .025));
+}
+.step-item.is-active .step-indicator { color: #f08370; border-color: rgba(223, 101, 90, .7); }
+.metric-icon,.puzzle-icon { color: #edc65b; }
+.puzzle-panel {
+  border-color: rgba(237, 198, 91, .24);
+  background:
+    linear-gradient(135deg, rgba(31, 34, 32, .98), rgba(19, 24, 25, .98));
+}
+.puzzle-panel::before {
+  background: linear-gradient(180deg, transparent, #edc65b 18%, #df655a 78%, transparent);
+}
+.clue-visual {
+  background:
+    linear-gradient(90deg, rgba(12, 17, 18, .8), rgba(12, 17, 18, .49)),
+    url("/lab-evidence.jpg") center 47% / cover,
+    radial-gradient(ellipse at center, rgba(237, 198, 91, .09), rgba(15, 19, 21, .4) 72%);
+}
+.clue-visual::before { background: rgba(237, 198, 91, .42); }
+.clue-visual::after { background: rgba(223, 101, 90, .24); }
+.gesture-card,.morse-group {
+  border-color: rgba(237, 198, 91, .28);
+  box-shadow: inset 0 0 0 1px rgba(237, 198, 91, .025);
+}
+.gesture-card small { color: #d4c38f; }
+.morse-group { color: #f0dfaf; }
+.keyboard-keys .key-wide { border-color: rgba(237, 198, 91, .55); }
+.button-primary {
+  border-color: #edc65b;
+  background: #edc65b;
+  color: #191712;
+}
+.button-primary:hover:not(:disabled) { background: #f6d77d; border-color: #f6d77d; }
+.button-quiet svg,.button-quiet:hover { color: #f08370; }
+.bottom-note-line { background: #df655a; }
+.sudoku-grid { border-color: rgba(237, 198, 91, .75); }
+.sudoku-grid input { color: #edc65b; }
+.sudoku-grid input:focus { background: rgba(237, 198, 91, .14); box-shadow: inset 0 0 0 1px #edc65b; }
+.sudoku-grid input.block-right,.sudoku-grid input.block-bottom { border-color: rgba(237, 198, 91, .55); }
+.evidence-art { color: #f08370; border-color: rgba(223, 101, 90, .42); background: rgba(223, 101, 90, .08); }
+.analysis-notes > div { border-left-color: rgba(223, 101, 90, .8); background: rgba(223, 101, 90, .075); }
+.culprit-option:hover,.culprit-option.selected {
+  border-color: rgba(237, 198, 91, .8);
+  background: rgba(237, 198, 91, .09);
+}
+.radio-mark { border-radius: 2px; }
+.radio-mark span { background: #df655a; border-radius: 0; }
+.sound-toggle[aria-pressed="true"] {
+  border-color: rgba(237, 198, 91, .58);
+  color: #edc65b;
+  background: rgba(237, 198, 91, .08);
+}
+.hero-title-wrap h1,.solved-card h1 { text-shadow: 0 5px 32px rgba(0, 0, 0, .34); }
+.evidence-row:nth-child(2) { animation-delay: .08s; }
+.evidence-row:nth-child(3) { animation-delay: .16s; }
+
+@media (max-width: 760px) {
+  .welcome-hero {
+    background:
+      linear-gradient(90deg, rgba(12, 16, 18, .9), rgba(12, 16, 18, .56)),
+      linear-gradient(0deg, rgba(12, 16, 18, .55), transparent 58%),
+      url("/lab-evidence.jpg") 61% center / cover,
+      #151719;
+  }
+  .welcome-hero::before {
+    top: 54px;
+    right: -112px;
+    width: 305px;
+    font-size: 7px;
+  }
 }
 
 .app-shell { min-height: 100dvh; background: #111518; overflow: hidden; }
@@ -358,4 +490,354 @@
   .morse-reference-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .gesture-sequence { gap: 8px; }
   .gesture-card { width: 55px; }
+}
+
+/* Evidence-room direction: midnight teal, aged paper, and restrained brass. */
+.app-shell {
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 79% 9%, rgba(53, 77, 73, .15), transparent 36rem),
+    radial-gradient(ellipse at 5% 74%, rgba(99, 68, 48, .08), transparent 34rem),
+    #101719;
+}
+.app-shell::before { opacity: .1; mix-blend-mode: soft-light; }
+.topbar {
+  background: rgba(13, 19, 21, .94);
+  border-bottom-color: rgba(218, 190, 131, .22);
+  box-shadow: 0 5px 28px rgba(0, 0, 0, .15);
+}
+.brand-mark {
+  border-radius: 2px;
+  border-color: rgba(217, 187, 125, .55);
+  color: var(--amber);
+  box-shadow: inset 0 0 0 3px rgba(217, 187, 125, .04);
+}
+.brand-name b { color: var(--amber); }
+.case-ref strong { color: #e6d4a9; }
+.live-dot,.status-light {
+  background: var(--amber);
+  box-shadow: 0 0 0 3px rgba(217, 187, 125, .13);
+}
+.lab-status .status-light { animation: status-breathe 3.4s ease-in-out infinite; }
+
+.welcome-hero {
+  background:
+    linear-gradient(90deg, rgba(15, 22, 24, .98) 0%, rgba(15, 22, 24, .9) 43%, rgba(15, 22, 24, .32) 100%),
+    linear-gradient(0deg, rgba(15, 22, 24, .55), transparent 53%),
+    url("/lab-evidence.jpg") 67% center / cover,
+    #151d20;
+}
+.welcome-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .4;
+  background: linear-gradient(135deg, transparent 55%, rgba(217, 187, 125, .09));
+}
+.hero-rings { border-color: rgba(217, 187, 125, .17); }
+.hero-rings::before,.hero-rings::after { border-color: rgba(217, 187, 125, .11); }
+.orb-one { background: radial-gradient(circle, rgba(157, 197, 177, .11), transparent 68%); }
+.orb-two { background: radial-gradient(circle, rgba(217, 187, 125, .09), transparent 72%); }
+.eyebrow { color: #c0c8bf; }
+.eyebrow-line { background: var(--amber); }
+.hero-kicker,.solved-kicker { color: var(--amber); }
+.hero-title-wrap h1,.solved-card h1 { color: #f1eee4; }
+.hero-title-wrap h1 em,.solved-card h1 em { color: #b0d3b9; }
+.hero-description { color: #c2cbc4; text-shadow: 0 1px 14px rgba(0, 0, 0, .32); }
+.hero-stats { color: #a1adaa; }
+.hero-stats b { color: #f0e8d4; }
+.hero-stamp {
+  border-color: rgba(217, 187, 125, .58);
+  color: var(--amber);
+  background: rgba(17, 25, 25, .48);
+}
+.welcome-side { background: linear-gradient(160deg, #151e20, #111719 72%); }
+.welcome-start h2,.leaderboard-heading h3 { color: #eeeade; }
+.panel-overline { color: #b1bcb5; }
+.welcome-start > p { color: #b0bbb5; }
+.field-label { color: #d0d5cc; }
+.field-label span { color: #9da9a3; }
+.answer-field-wrap {
+  background: rgba(7, 12, 13, .52);
+  border-color: rgba(197, 210, 204, .26);
+}
+.answer-field-wrap input { color: #f2eee3; }
+.answer-field-wrap input::placeholder { color: #929e99; }
+.field-flag { color: #b1c2b7; }
+.button-primary {
+  border-color: #a6d2b8;
+  background: #a6d2b8;
+  color: #10201a;
+  box-shadow: 0 5px 16px rgba(6, 12, 10, .16);
+}
+.button-primary:hover:not(:disabled) {
+  background: #c0e1cb;
+  border-color: #c0e1cb;
+  transform: translateY(-2px);
+}
+.button-primary:active:not(:disabled) { transform: translateY(0); }
+.button-primary:disabled { opacity: .62; }
+.privacy-note,.leaderboard-empty { color: #a4aeaa; }
+.leaderboard { border-color: transparent; }
+.leaderboard-rows { border-bottom: 1px solid var(--line); }
+.leader-row { border-top-color: rgba(196, 207, 199, .13); }
+.leader-name small,.leaderboard-foot { color: #9aa59f; }
+.leaderboard-empty { border-color: var(--line); }
+.leaderboard-empty .empty-dash { color: var(--amber); }
+
+.case-rail { background: linear-gradient(180deg, #151e20, #111719); }
+.case-stamp { color: var(--amber); border-color: rgba(217, 187, 125, .44); }
+.rail-case p,.step-copy small,.rail-footer small { color: #a1aca7; }
+.case-meta,.rail-section-label,.case-label { color: #9ba8a1; }
+.case-meta strong { color: #e1dfd3; }
+.step-item.is-active {
+  border-color: rgba(161, 208, 181, .34);
+  background: linear-gradient(90deg, rgba(161, 208, 181, .1), rgba(161, 208, 181, .025));
+}
+.step-indicator { border-color: rgba(196, 207, 199, .24); color: #a3aea8; }
+.step-copy b { color: #d8ddd4; }
+.rail-footer { border-color: rgba(217, 187, 125, .24); }
+.rail-footer-icon { border-color: rgba(217, 187, 125, .38); color: var(--amber); }
+.rail-footer b { color: #e2e2d8; }
+.main-investigation { background: radial-gradient(ellipse at 50% 28%, rgba(67, 85, 77, .075), transparent 38rem); }
+.metrics-strip { border-bottom-color: rgba(217, 187, 125, .2); }
+.metric-label { color: #a6b0aa; }
+.metric strong { color: #f0ead9; }
+.metric-icon { color: #b4c8b9; }
+.workbench-heading h1 { color: #f0eee4; }
+.case-narrative { color: #aeb8b2; }
+.lab-seal {
+  border-color: rgba(217, 187, 125, .44);
+  color: #d6bd86;
+  background: rgba(17, 24, 24, .45);
+}
+.puzzle-panel {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(189, 204, 199, .2);
+  background: linear-gradient(135deg, rgba(26, 36, 37, .97), rgba(18, 26, 28, .98));
+  box-shadow: 0 22px 64px rgba(0, 0, 0, .25), inset 0 1px rgba(238, 233, 214, .035);
+}
+.puzzle-panel::before {
+  content: "";
+  position: absolute;
+  width: 3px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, transparent, rgba(217, 187, 125, .62) 18%, rgba(161, 208, 181, .22) 78%, transparent);
+  opacity: .65;
+}
+.puzzle-intro h2 { color: #eeeade; }
+.puzzle-intro p { color: #aeb9b3; }
+.puzzle-icon { color: #b5d4bd; border-color: rgba(161, 208, 181, .34); background: rgba(161, 208, 181, .07); }
+.clue-visual {
+  background:
+    linear-gradient(90deg, rgba(12, 19, 20, .86), rgba(12, 19, 20, .73)),
+    url("/lab-evidence.jpg") center 47% / cover,
+    radial-gradient(ellipse at center, rgba(161, 208, 181, .09), rgba(15, 19, 21, .4) 72%);
+}
+.clue-visual::before {
+  z-index: 2;
+  background: rgba(183, 218, 194, .23);
+  animation: evidence-scan 5.6s ease-in-out infinite;
+  transform-origin: center;
+}
+.clue-visual::after { background: rgba(183, 218, 194, .11); }
+.visual-label { color: #bdc8c0; }
+.gesture-card,.morse-group {
+  border-color: rgba(205, 216, 207, .24);
+  background: rgba(20, 30, 30, .91);
+}
+.gesture-card { animation: evidence-arrive .65s both; }
+.gesture-card:nth-child(2) { animation-delay: .08s; }
+.gesture-card:nth-child(3) { animation-delay: .16s; }
+.gesture-card:nth-child(4) { animation-delay: .24s; }
+.gesture-card small { color: #aebcb3; }
+.gesture-hand { border-color: rgba(168, 213, 187, .94); }
+.gesture-hand::before,.gesture-hand::after,.gesture-hand i { border-color: rgba(168, 213, 187, .94); }
+.morse-group { color: #e4e1d5; }
+.morse-reference { color: #b5c0b8; }
+.morse-reference summary { color: var(--amber); }
+.morse-reference-grid span { border-color: rgba(203, 215, 211, .17); }
+.morse-reference-grid b { color: #ece9dd; }
+.morse-reference-grid code { color: #b1d1bb; }
+.keyboard-keys span { border-color: rgba(198, 214, 203, .31); background: linear-gradient(#303c39,#202927); color: #e2e6dc; }
+.keyboard-keys .key-wide { color: #b7d2bf; }
+.button-quiet { color: #c3ccc5; }
+.button-quiet:hover { color: #f0d193; }
+.puzzle-footnote { color: #a8b3ad; border-color: var(--line); }
+.answer-format-note { color: #aab5ae; }
+.feedback-banner { box-shadow: 0 7px 22px rgba(0, 0, 0, .13); }
+.feedback-success { color: #b3e0c2; }
+.feedback-error { color: #f0b0a5; }
+.feedback-hint { color: #edd294; }
+.bottom-note { color: #9ca8a2; }
+.bottom-note-line { background: #d1b875; }
+.bottom-right { color: #b0bbb5; }
+.tube-record { background: rgba(9, 15, 16, .43); }
+.tube-record-head { color: #bdc8bf; }
+.tube-row { color: #d0d6cd; }
+.tube-row b,.tube-row.tube-header { color: #bdc7bf; }
+.tube-row.tube-header { color: #a5b0aa; }
+.mono-value { color: #e5e0d2; }
+.seal { color: #d0d7ce; }
+.clue-list > div { border-color: rgba(203, 215, 211, .16); background: rgba(161, 208, 181, .045); }
+.clue-list p { color: #bdc7c0; }
+.clue-list b { color: #f0ede2; }
+.sudoku-grid { border-color: rgba(161, 208, 181, .72); }
+.sudoku-grid input { color: #b3dfc1; background: #151e20; }
+.sudoku-grid input:focus { background: rgba(161, 208, 181, .15); }
+.sudoku-grid input.given { color: #f0ecdf; background: #25302f; }
+.sudoku-caption { color: #aeb8b2; }
+.sudoku-caption b { color: #d6e0d6; }
+.suspect-chip { border-color: rgba(203, 215, 211, .2); background: rgba(9, 15, 16, .42); }
+.suspect-chip b { color: #e7e6dc; }
+.suspect-chip small { color: #a2aea7; }
+.analysis-notes > div { border-left-color: rgba(217, 187, 125, .63); background: rgba(217, 187, 125, .06); }
+.analysis-notes span { color: #d4bd87; }
+.analysis-notes p { color: #bdc7c0; }
+.analysis-notes b { color: #efede2; }
+.evidence-row { border-color: rgba(189, 204, 199, .17); }
+.evidence-art { color: #b7d3bd; border-color: rgba(161, 208, 181, .3); background: rgba(161, 208, 181, .07); }
+.evidence-name b { color: #e6e7dc; }
+.evidence-name small { color: #a6b1ab; }
+.evidence-arrow { color: #b6c5ba; }
+.evidence-row select { color: #ece9df; background: #182224; border-color: rgba(193, 206, 204, .26); }
+.evidence-row select:focus { border-color: #a1d0b5; }
+.culprit-option {
+  border-color: rgba(203, 215, 211, .22);
+  background: rgba(9, 15, 16, .43);
+  color: #ece9df;
+}
+.culprit-option:hover,.culprit-option.selected {
+  border-color: rgba(161, 208, 181, .72);
+  background: rgba(161, 208, 181, .1);
+}
+.culprit-index { color: var(--amber); }
+.culprit-info small { color: #aab5ae; }
+.radio-mark { border-color: #9aa8a0; }
+.final-note { color: #b1bbb4; }
+.solved-layout { background: radial-gradient(ellipse at 18% 48%, rgba(68, 91, 77, .12), transparent 35rem); }
+.solved-stamp { border-color: rgba(217, 187, 125, .52); color: #b0d8b8; }
+.solved-copy { color: #b5c0b8; }
+.solved-metrics span { color: #aab5ae; }
+.solved-metrics b { color: #f0ecdf; }
+.solved-records .leaderboard { border-color: rgba(189, 204, 199, .22); background: #172123; }
+.closing-note { color: #a5b1aa; }
+.closing-note small { color: #899690; }
+.closing-line { background: var(--amber); }
+
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(189, 204, 199, .24);
+  background: rgba(26, 36, 37, .72);
+  color: #d4ddd4;
+  font: 9px var(--app-font-mono);
+  letter-spacing: .08em;
+  transition: transform .18s ease, background-color .18s ease, border-color .18s ease;
+}
+.sound-toggle:hover { transform: translateY(-1px); border-color: rgba(217, 187, 125, .58); }
+.sound-toggle:active { transform: translateY(0); }
+
+.welcome-hero > .hero-content,
+.welcome-side,
+.case-rail,
+.main-investigation,
+.solved-card,
+.solved-records {
+  animation: panel-arrive .72s cubic-bezier(.2,.7,.25,1) both;
+}
+.welcome-side { animation-delay: .12s; }
+.case-rail { animation-delay: .04s; }
+.main-investigation { animation-delay: .12s; }
+.puzzle-panel { animation: panel-arrive .56s cubic-bezier(.2,.7,.25,1) both; }
+.evidence-row { animation: evidence-arrive .45s both; }
+.evidence-row:nth-child(2) { animation-delay: .08s; }
+.evidence-row:nth-child(3) { animation-delay: .16s; }
+.culprit-option { transition: transform .2s ease, border-color .2s ease, background-color .2s ease; }
+.culprit-option:hover { transform: translateY(-2px); }
+.feedback-banner { animation: feedback-in .24s ease-out both; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid #e0c37f;
+  outline-offset: 3px;
+}
+
+@keyframes panel-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes evidence-arrive {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes evidence-scan {
+  0%, 100% { transform: translateY(-42px); }
+  50% { transform: translateY(42px); }
+}
+@keyframes status-breathe {
+  0%, 100% { opacity: .75; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 760px) {
+  .welcome-hero {
+    background:
+      linear-gradient(90deg, rgba(15, 22, 24, .97), rgba(15, 22, 24, .76)),
+      linear-gradient(0deg, rgba(15, 22, 24, .58), transparent 58%),
+      url("/lab-evidence.jpg") 61% center / cover,
+      #151d20;
+  }
+  .topbar { background: rgba(13, 19, 21, .97); }
+  .case-rail { background: #151e20; }
+  .puzzle-panel { box-shadow: 0 13px 36px rgba(0, 0, 0, .2); }
+  .metrics-strip { border-bottom-color: rgba(217, 187, 125, .2); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Keep the crime-scene palette on top of the original component defaults. */
+.hero-title-wrap h1 em,.solved-card h1 em { color: #edc65b; }
+.hero-kicker,.solved-kicker { color: #f08370; }
+.hero-stats b,.metric-icon,.puzzle-icon { color: #edc65b; }
+.hero-stamp,.case-stamp {
+  border-color: rgba(223, 101, 90, .7);
+  color: #f08370;
+  background: rgba(223, 101, 90, .12);
+}
+.step-item.is-active {
+  border-color: rgba(223, 101, 90, .42);
+  background: linear-gradient(90deg, rgba(223, 101, 90, .13), rgba(223, 101, 90, .025));
+}
+.step-item.is-active .step-indicator { color: #f08370; border-color: rgba(223, 101, 90, .7); }
+.button-primary {
+  border-color: #edc65b;
+  background: #edc65b;
+  color: #191712;
+}
+.button-primary:hover:not(:disabled) { background: #f6d77d; border-color: #f6d77d; }
+.button-quiet:hover { color: #f08370; }
+.clue-visual::before { background: rgba(237, 198, 91, .42); }
+.evidence-art { color: #f08370; border-color: rgba(223, 101, 90, .42); background: rgba(223, 101, 90, .08); }
+.analysis-notes > div { border-left-color: rgba(223, 101, 90, .8); background: rgba(223, 101, 90, .075); }
+.culprit-option:hover,.culprit-option.selected {
+  border-color: rgba(237, 198, 91, .8);
+  background: rgba(237, 198, 91, .09);
+}
+.sound-toggle[aria-pressed="true"] {
+  border-color: rgba(237, 198, 91, .58);
+  color: #edc65b;
+  background: rgba(237, 198, 91, .08);
 }

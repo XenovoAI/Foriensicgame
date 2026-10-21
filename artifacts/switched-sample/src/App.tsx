@@ -4,9 +4,10 @@ import {
   ArrowRight, AudioLines, BadgeCheck, Biohazard, Check, ChevronRight,
   Clock3, Fingerprint, FlaskConical, Footprints, KeyRound, Lightbulb,
   LockKeyhole, Microscope, RotateCcw, ScanLine, ShieldAlert, Sparkles,
-  TriangleAlert, UserRound, Waves, X,
+  TriangleAlert, UserRound, Volume2, VolumeX, Waves, X,
 } from 'lucide-react';
 import { useGameSession } from './game-session';
+import { useSoundEffects } from './sound-effects';
 import './App.css';
 
 const doorPuzzles = [
@@ -45,6 +46,7 @@ function formatTime(seconds: number) {
 
 function App() {
   const game = useGameSession();
+  const sound = useSoundEffects();
   const [playerName, setPlayerName] = useState(game.playerName ?? '');
   const [answer, setAnswer] = useState('');
   const [sudoku, setSudoku] = useState(sudokuClues);
@@ -73,16 +75,25 @@ function App() {
     const payload = activePuzzleId === 'sudoku' ? sudoku.join('') : activePuzzleId === 'evidence'
       ? evidenceTypes.map((type) => evidenceMatches[type] ?? '').join(',')
       : answer.trim();
-    game.submit(activePuzzleId, payload);
+    submitPuzzle(activePuzzleId, payload);
   }
 
   function submitEvidence() {
     const payload = evidenceTypes.map((type) => evidenceMatches[type] ?? '').join(',');
-    game.submit('evidence', payload);
+    submitPuzzle('evidence', payload);
+  }
+
+  function submitPuzzle(puzzleId: PuzzleId, payload: string) {
+    const wasDoorUnlock = puzzleId === 'keyboard' && game.solvedPuzzles.length === 2;
+    const correct = game.submit(puzzleId, payload);
+    sound.play(correct ? (wasDoorUnlock ? 'unlock' : 'success') : 'error');
   }
 
   function requestHint() {
-    if (activePuzzleId) game.requestHint(activePuzzleId);
+    if (activePuzzleId) {
+      game.requestHint(activePuzzleId);
+      sound.play('hint');
+    }
   }
 
   function updateSudoku(index: number, value: string) {
@@ -93,12 +104,15 @@ function App() {
   function startGame(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const cleanName = playerName.trim();
-    if (cleanName) game.start(cleanName);
+    if (cleanName) {
+      game.start(cleanName);
+      sound.play('click');
+    }
   }
 
   function chooseCulprit(name: string) {
     setSelectedSuspect(name);
-    game.chooseSuspect(name);
+    sound.play(game.chooseSuspect(name) ? 'case-closed' : 'error');
   }
 
   const current = currentDoor;
@@ -125,6 +139,17 @@ function App() {
           {game.playerName && <span className="investigator-name" data-testid="text-player-name"><UserRound size={14} /> {game.playerName}</span>}
           <span className="topbar-divider" />
           <span className="lab-status"><span className="status-light" /> SECURE SESSION</span>
+          <button
+            className="sound-toggle"
+            type="button"
+            aria-label={sound.enabled ? 'Turn sound effects off' : 'Turn sound effects on'}
+            aria-pressed={sound.enabled}
+            onClick={sound.toggle}
+            data-testid="button-toggle-sound"
+          >
+            {sound.enabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            <span>{sound.enabled ? 'SOUND ON' : 'SOUND OFF'}</span>
+          </button>
         </div>
       </header>
 
@@ -136,7 +161,7 @@ function App() {
           leaderboard={game.leaderboard}
         />
       ) : game.stage === 'solved' ? (
-        <Solved game={game} onRestart={game.restart} />
+        <Solved game={game} onRestart={() => { game.restart(); sound.play('click'); }} />
       ) : (
         <div className="investigation-layout">
           <aside className="case-rail">
@@ -200,7 +225,7 @@ function App() {
                 <form onSubmit={submitAnswer}>
                   <label className="field-label" htmlFor="answer-sample">WHICH TUBE IS GENUINE? <span>REQUIRED</span></label>
                   <div className="answer-field-wrap"><input id="answer-sample" data-testid="input-answer-sample" autoComplete="off" placeholder="Enter tube A, B, or C…" value={answer} onChange={(event) => setAnswer(event.target.value)} /><span className="field-flag"><ScanLine size={16} /></span></div>
-                  <div className="form-actions"><button className="button-primary" type="submit" data-testid="button-submit-sample">Submit finding <ArrowRight size={16} /></button><button className="button-quiet" type="button" onClick={requestHint} data-testid="button-hint-sample"><Lightbulb size={15} /> Request a hint</button></div>
+                <div className="form-actions"><button className="button-primary" type="submit" data-testid="button-submit-sample">Submit finding <ArrowRight size={16} /></button><button className="button-quiet" type="button" onClick={requestHint} data-testid="button-hint-sample"><Lightbulb size={15} /> Request a hint</button></div>
                 </form>
               </div>}
               {game.stage === 'sudoku' && <div className="puzzle-panel sudoku-panel">
@@ -326,7 +351,7 @@ function SignGlyph({ index }: { index: number }) {
     'M19 45 L19 31 C19 27 25 27 25 31 L25 22 C25 17 31 17 31 22 L31 29 C32 25 38 26 38 31 L38 34 C41 31 46 33 45 38 L42 46 C40 50 35 52 29 52 L24 52 Z M19 32 L14 28 C11 26 8 30 11 33 L19 41 M24 25 L20 19 C18 16 21 13 24 16',
   ];
   return <svg className={`sign-glyph sign-glyph-${index + 1}`} viewBox="0 0 56 56" aria-hidden="true" data-testid={`illustration-asl-${index + 1}`}>
-    <path d={handPaths[index]} fill="rgba(139,200,172,.12)" stroke="#8bc8ac" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    <path d={handPaths[index]} fill="rgba(237,198,91,.12)" stroke="#edc65b" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
   </svg>;
 }
 
