@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "The Switched Sample"
+description = "A playable forensic mystery game where investigators solve linked puzzles, examine evidence, identify the culprit, and compare completion scores."
+version = "1.0.0"
+id = "artifacts/switched-sample"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24151
+
+[services.development]
+run = "pnpm --filter @workspace/switched-sample run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/switched-sample", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/switched-sample/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24151"
+BASE_PATH = "/"

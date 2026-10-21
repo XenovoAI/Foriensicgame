@@ -1,10 +1,11 @@
-# [Project name]
+# The Switched Sample
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A browser-based forensic mystery where players solve linked puzzles, investigate evidence, identify the culprit, and compare local scores.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/switched-sample run dev` — run the game website
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -26,11 +27,13 @@ _Populate as you build — short repo map plus pointers to the source-of-truth f
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The game is playable without an account or server-side data; a browser-local session stores progress and the top-three leaderboard.
+- Puzzle answers and scoring are maintained in the frontend game-session module.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Players solve a sign-language clue, Morse messages, a keyboard riddle, sample logic, a 4×4 Sudoku, evidence matching, and a final suspect decision.
+- The game tracks mistakes, hints, elapsed time, and score, and keeps a local leaderboard on the same browser.
 
 ## User preferences
 
