@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "artifacts/api-server/src/app.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "artifacts/switched-sample/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/switched-sample build",
+        "distDir": "dist/public"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/artifacts/api-server/src/app.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
