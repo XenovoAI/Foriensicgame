@@ -1,30 +1,33 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "artifacts/api-server/src/app.ts",
-      "use": "@vercel/node"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "api-server": {
+      "root": "artifacts/api-server",
+      "framework": "express"
     },
-    {
-      "src": "artifacts/switched-sample/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/switched-sample build",
-        "distDir": "dist/public"
-      }
+    "mockup-sandbox": {
+      "root": "artifacts/mockup-sandbox",
+      "framework": "vite",
+      "outputDirectory": "dist"
+    },
+    "switched-sample": {
+      "root": "artifacts/switched-sample",
+      "framework": "vite",
+      "outputDirectory": "dist/public"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/artifacts/api-server/src/app.ts"
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api-server"
+      }
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": {
+        "service": "switched-sample"
+      }
     }
   ]
 }
