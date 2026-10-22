@@ -6,7 +6,7 @@ import {
   LockKeyhole, Microscope, RotateCcw, ScanLine, ShieldAlert, Sparkles,
   TriangleAlert, UserRound, Volume2, VolumeX, Waves, X,
 } from 'lucide-react';
-import { useGameSession } from './game-session';
+import { useGameSession, type LeaderboardEntry } from './game-session';
 import { useSoundEffects } from './sound-effects';
 import './App.css';
 
@@ -52,6 +52,16 @@ function App() {
   const [sudoku, setSudoku] = useState(sudokuClues);
   const [evidenceMatches, setEvidenceMatches] = useState<Record<string, string>>({});
   const [selectedSuspect, setSelectedSuspect] = useState('');
+  const leaderboardProps: LeaderboardPanelProps = {
+    localLeaderboard: game.leaderboard,
+    sharedLeaderboard: game.sharedLeaderboard,
+    source: game.leaderboardSource,
+    loading: game.leaderboardLoading,
+    error: game.leaderboardError,
+    submissionStatus: game.submissionStatus,
+    onRefresh: game.refreshSharedLeaderboard,
+    onRetrySubmission: game.retryScoreSubmission,
+  };
 
   const currentDoor = useMemo(() => doorPuzzles.find((puzzle) => !game.solvedPuzzles.includes(puzzle.id)), [game.solvedPuzzles]);
   const activePuzzleId: PuzzleId | null = game.stage === 'door'
@@ -158,10 +168,10 @@ function App() {
           playerName={playerName}
           setPlayerName={setPlayerName}
           onStart={startGame}
-          leaderboard={game.leaderboard}
+          leaderboard={leaderboardProps}
         />
       ) : game.stage === 'solved' ? (
-        <Solved game={game} onRestart={() => { game.restart(); sound.play('click'); }} />
+        <Solved game={game} leaderboard={leaderboardProps} onRestart={() => { game.restart(); sound.play('click'); }} />
       ) : (
         <div className="investigation-layout">
           <aside className="case-rail">
@@ -359,7 +369,7 @@ function Welcome({ playerName, setPlayerName, onStart, leaderboard }: {
   playerName: string;
   setPlayerName: (name: string) => void;
   onStart: (event: FormEvent<HTMLFormElement>) => void;
-  leaderboard: { playerName: string; score: number; elapsedSeconds: number; correctAnswers: number }[];
+  leaderboard: LeaderboardPanelProps;
 }) {
   return <div className="welcome-layout">
     <section className="welcome-hero">
@@ -378,29 +388,50 @@ function Welcome({ playerName, setPlayerName, onStart, leaderboard }: {
         <h2>Begin your<br />investigation.</h2>
         <p>Every clue is in the record. Take your time; accuracy counts.</p>
         <form onSubmit={onStart}>
-          <label className="field-label" htmlFor="player-name">INVESTIGATOR NAME <span>LOCAL RECORD</span></label>
+          <label className="field-label" htmlFor="player-name">INVESTIGATOR NAME <span>SHARED SCORE</span></label>
           <div className="answer-field-wrap"><input id="player-name" data-testid="input-player-name" value={playerName} onChange={(event) => setPlayerName(event.target.value)} maxLength={24} placeholder="Enter your name" autoComplete="name" /><span className="field-flag"><UserRound size={16} /></span></div>
           <button className="button-primary start-button" type="submit" disabled={!playerName.trim()} data-testid="button-start-investigation">Open case file <ArrowRight size={17} /></button>
         </form>
-        <div className="privacy-note"><LockKeyhole size={13} /> Your results stay on this device.</div>
+        <div className="privacy-note"><LockKeyhole size={13} /> Your name and completed score are shared when online.</div>
       </div>
-      <Leaderboard leaderboard={leaderboard} />
+      <Leaderboard {...leaderboard} />
     </aside>
   </div>;
 }
 
-function Leaderboard({ leaderboard }: { leaderboard: { playerName: string; score: number; elapsedSeconds: number; correctAnswers: number }[] }) {
-  const topThree = [...leaderboard].sort((a, b) => b.score - a.score || a.elapsedSeconds - b.elapsedSeconds).slice(0, 3);
+interface LeaderboardPanelProps {
+  localLeaderboard: LeaderboardEntry[];
+  sharedLeaderboard: LeaderboardEntry[];
+  source: 'local' | 'shared';
+  loading: boolean;
+  error: string | null;
+  submissionStatus: 'idle' | 'submitting' | 'shared' | 'error';
+  onRefresh: () => void;
+  onRetrySubmission: () => void;
+}
+
+function Leaderboard({ localLeaderboard, sharedLeaderboard, source, loading, error, submissionStatus, onRefresh, onRetrySubmission }: LeaderboardPanelProps) {
+  const entries = source === 'shared' ? sharedLeaderboard : localLeaderboard;
+  const topThree = [...entries].sort((a, b) => b.score - a.score || a.elapsedSeconds - b.elapsedSeconds).slice(0, 3);
   return <div className="leaderboard" data-testid="leaderboard">
-    <div className="leaderboard-heading"><div><span className="panel-overline">LOCAL RECORDS</span><h3>Best investigators</h3></div><span className="leaderboard-mark"><BadgeCheck size={17} /></span></div>
+    <div className="leaderboard-heading"><div><span className="panel-overline">{source === 'shared' ? 'SHARED RECORDS' : 'LOCAL RECORDS'}</span><h3>Best investigators</h3></div><span className="leaderboard-mark"><BadgeCheck size={17} /></span></div>
     {topThree.length ? <div className="leaderboard-rows">{topThree.map((entry, index) => <div className="leader-row" key={`${entry.playerName}-${index}`} data-testid={`leaderboard-row-${index}`}>
       <span className={`rank rank-${index + 1}`}>{String(index + 1).padStart(2, '0')}</span><span className="leader-name"><b>{entry.playerName}</b><small>{entry.correctAnswers} CORRECT · {formatTime(entry.elapsedSeconds)}</small></span><strong>{entry.score.toLocaleString()}<small>PTS</small></strong>
     </div>)}</div> : <div className="leaderboard-empty" data-testid="leaderboard-empty"><span className="empty-dash">—</span><span>No case files closed yet.<br />Set the first record.</span></div>}
-    <div className="leaderboard-foot"><span>TOP THREE</span><span>THIS DEVICE ONLY</span></div>
+    {loading && <p className="leaderboard-notice" role="status">Checking shared records. Showing this device’s results until connected.</p>}
+    {error && <div className="leaderboard-notice" role="alert">
+      <span>{error}</span>
+      <button className="leaderboard-retry" type="button" onClick={submissionStatus === 'error' ? onRetrySubmission : onRefresh}>
+        {submissionStatus === 'error' ? 'Retry score sharing' : 'Retry shared records'}
+      </button>
+    </div>}
+    {submissionStatus === 'submitting' && <p className="leaderboard-notice" role="status">Sharing your completed case score…</p>}
+    {submissionStatus === 'shared' && <p className="leaderboard-notice" role="status">Your case score is now shared with investigators everywhere.</p>}
+    <div className="leaderboard-foot"><span>TOP THREE</span><span>{source === 'shared' ? 'ACROSS DEVICES' : 'THIS DEVICE ONLY'}</span></div>
   </div>;
 }
 
-function Solved({ game, onRestart }: { game: ReturnType<typeof useGameSession>; onRestart: () => void }) {
+function Solved({ game, leaderboard, onRestart }: { game: ReturnType<typeof useGameSession>; leaderboard: LeaderboardPanelProps; onRestart: () => void }) {
   return <div className="solved-layout">
     <section className="solved-card">
       <div className="solved-stamp"><Check size={24} /></div>
@@ -415,7 +446,7 @@ function Solved({ game, onRestart }: { game: ReturnType<typeof useGameSession>; 
       </div>
       <button className="button-primary" type="button" onClick={onRestart} data-testid="button-restart"><RotateCcw size={15} /> Start another investigation</button>
     </section>
-    <aside className="solved-records"><Leaderboard leaderboard={game.leaderboard} /><div className="closing-note"><span className="closing-line" /> NORTHWELL FORENSIC SERVICES<br /><small>INTERNAL CASEWORK / TS–0418</small></div></aside>
+    <aside className="solved-records"><Leaderboard {...leaderboard} /><div className="closing-note"><span className="closing-line" /> NORTHWELL FORENSIC SERVICES<br /><small>INTERNAL CASEWORK / TS–0418</small></div></aside>
   </div>;
 }
 

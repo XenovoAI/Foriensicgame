@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  getInvestigatorLeaderboard,
+  submitInvestigatorScore,
+} from '@workspace/api-client-react';
 
 export type GameStage =
   | 'welcome'
@@ -34,6 +38,7 @@ interface GameFeedback {
 interface Session {
   stage: GameStage;
   playerName: string;
+  attemptId: string | null;
   startedAt: number | null;
   finishedSeconds: number | null;
   mistakes: number;
@@ -72,6 +77,7 @@ const HINTS: Record<PuzzleId, string> = {
 const createSession = (): Session => ({
   stage: 'welcome',
   playerName: '',
+  attemptId: null,
   startedAt: null,
   finishedSeconds: null,
   mistakes: 0,
@@ -144,6 +150,10 @@ function readGame(): PersistedGame {
           typeof rawSession.playerName === 'string'
             ? rawSession.playerName
             : '',
+        attemptId:
+          typeof rawSession.attemptId === 'string'
+            ? rawSession.attemptId
+            : null,
         startedAt:
           typeof rawSession.startedAt === 'number'
             ? rawSession.startedAt
@@ -223,6 +233,10 @@ export function useGameSession() {
   const [game, setGame] = useState<PersistedGame>(readGame);
   const gameRef = useRef(game);
   const [clock, setClock] = useState(() => Date.now());
+  const [sharedLeaderboard, setSharedLeaderboard] = useState<LeaderboardEntry[] | null>(null);
+  const [sharedStatus, setSharedStatus] = useState<'loading' | 'shared' | 'local'>('loading');
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'shared' | 'error'>('idle');
 
   const updateGame = useCallback((change: (current: PersistedGame) => PersistedGame) => {
     const updated = change(gameRef.current);
@@ -235,6 +249,75 @@ export function useGameSession() {
     }
     return updated;
   }, []);
+
+  const refreshSharedLeaderboard = useCallback(async () => {
+    try {
+      const entries = await getInvestigatorLeaderboard();
+      setSharedLeaderboard(entries);
+      setSharedStatus('shared');
+      setLeaderboardError(null);
+    } catch {
+      setSharedLeaderboard(null);
+      setSharedStatus('local');
+      setLeaderboardError(
+        'Shared records are unavailable. Showing results saved on this device.',
+      );
+    }
+  }, []);
+
+  const submitCompletedScore = useCallback(async () => {
+    const completed = gameRef.current.session;
+    if (
+      completed.stage !== 'solved' ||
+      !completed.attemptId ||
+      completed.finalScore === null ||
+      completed.finishedSeconds === null
+    ) {
+      return;
+    }
+
+    setSubmissionStatus('submitting');
+    try {
+      const entries = await submitInvestigatorScore({
+        attemptId: completed.attemptId,
+        playerName: completed.playerName,
+        score: completed.finalScore,
+        elapsedSeconds: completed.finishedSeconds,
+        correctAnswers: completed.solvedPuzzles.length + 1,
+      });
+      setSharedLeaderboard(entries);
+      setSharedStatus('shared');
+      setLeaderboardError(null);
+      setSubmissionStatus('shared');
+    } catch {
+      setSharedLeaderboard(null);
+      setSharedStatus('local');
+      setLeaderboardError(
+        'This completed score is saved on this device, but could not be shared.',
+      );
+      setSubmissionStatus('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshSharedLeaderboard();
+  }, [refreshSharedLeaderboard]);
+
+  useEffect(() => {
+    if (game.session.stage === 'solved') {
+      void submitCompletedScore();
+    } else {
+      setSubmissionStatus('idle');
+    }
+  }, [
+    game.session.stage,
+    game.session.attemptId,
+    game.session.playerName,
+    game.session.finalScore,
+    game.session.finishedSeconds,
+    game.session.solvedPuzzles.length,
+    submitCompletedScore,
+  ]);
 
   useEffect(() => {
     if (game.session.stage === 'welcome' || game.session.stage === 'solved') return;
@@ -253,6 +336,7 @@ export function useGameSession() {
           ...createSession(),
           stage: 'door',
           playerName,
+          attemptId: window.crypto.randomUUID(),
           startedAt: Date.now(),
           feedback: { type: 'success', message: 'Investigation started.' },
         },
@@ -458,6 +542,12 @@ export function useGameSession() {
     hintsUsed: session.hintsUsed,
     solvedPuzzles: session.solvedPuzzles,
     leaderboard: game.leaderboard,
+    sharedLeaderboard: sharedLeaderboard ?? [],
+    leaderboardSource:
+      sharedStatus === 'shared' ? ('shared' as const) : ('local' as const),
+    leaderboardLoading: sharedStatus === 'loading',
+    leaderboardError,
+    submissionStatus,
     feedback: session.feedback,
     correctAnswers: session.solvedPuzzles.length + (session.stage === 'solved' ? 1 : 0),
     start,
@@ -466,5 +556,7 @@ export function useGameSession() {
     requestHint,
     clearFeedback,
     restart,
+    refreshSharedLeaderboard,
+    retryScoreSubmission: submitCompletedScore,
   };
 }

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: leaderboard
+    description: Investigator leaderboard operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /leaderboard:
+    get:
+      operationId: getInvestigatorLeaderboard
+      tags: [leaderboard]
+      summary: Get the top investigator scores
+      responses:
+        "200":
+          description: Shared top investigator scores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestigatorLeaderboard"
+    post:
+      operationId: submitInvestigatorScore
+      tags: [leaderboard]
+      summary: Submit a completed case score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestigatorScoreInput"
+      responses:
+        "200":
+          description: Updated shared top investigator scores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestigatorLeaderboard"
+        "400":
+          description: Invalid score data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +70,60 @@ components:
           type: string
       required:
         - status
+    InvestigatorScore:
+      type: object
+      properties:
+        playerName:
+          type: string
+        score:
+          type: integer
+        elapsedSeconds:
+          type: integer
+        correctAnswers:
+          type: integer
+      required:
+        - playerName
+        - score
+        - elapsedSeconds
+        - correctAnswers
+    InvestigatorLeaderboard:
+      type: array
+      items:
+        $ref: "#/components/schemas/InvestigatorScore"
+    InvestigatorScoreInput:
+      type: object
+      additionalProperties: false
+      properties:
+        attemptId:
+          type: string
+          format: uuid
+        playerName:
+          type: string
+          minLength: 1
+          maxLength: 24
+        score:
+          type: integer
+          minimum: 100
+          maximum: 1200
+        elapsedSeconds:
+          type: integer
+          minimum: 0
+          maximum: 86400
+        correctAnswers:
+          type: integer
+          minimum: 1
+          maximum: 8
+      required:
+        - attemptId
+        - playerName
+        - score
+        - elapsedSeconds
+        - correctAnswers
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 
