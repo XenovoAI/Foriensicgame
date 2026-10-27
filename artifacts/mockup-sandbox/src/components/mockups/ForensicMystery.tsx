@@ -63,6 +63,7 @@ export default function ForensicMystery() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [analytics, setAnalytics] = useState<GameAnalytics | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [sudokuSolved, setSudokuSolved] = useState(false);
   const [morseDecoded, setMorseDecoded] = useState(false);
   const [timelineOrdered, setTimelineOrdered] = useState(false);
@@ -195,9 +196,11 @@ export default function ForensicMystery() {
         setLeaderboard(newLeaderboard);
         calculateAnalytics(newLeaderboard);
         setShowLeaderboard(true);
+        setHasSubmitted(true);
       }
     } catch (error) {
       console.error('Failed to submit score:', error);
+      alert('Failed to submit score. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -1337,48 +1340,63 @@ export default function ForensicMystery() {
             </div>
             <Button 
               onClick={submitScore}
-              disabled={!playerName.trim() || isSubmitting}
-              className="w-full bg-green-700 hover:bg-green-600"
+              disabled={!playerName.trim() || isSubmitting || hasSubmitted}
+              className="w-full bg-green-700 hover:bg-green-600 disabled:opacity-50"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit to Leaderboard'}
+              {isSubmitting ? 'Submitting...' : hasSubmitted ? '✓ Submitted to Leaderboard' : 'Submit to Leaderboard'}
             </Button>
+            {hasSubmitted && (
+              <p className="text-xs text-green-400 text-center">
+                Your score has been added! Scroll down to see the full leaderboard.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {showLeaderboard && leaderboard.length > 0 && (
+      {leaderboard.length > 0 && (
         <>
           <Card className="bg-slate-900/50 border-amber-900/30">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-amber-500" />
-                <CardTitle className="text-amber-100">Leaderboard - Top Investigators</CardTitle>
+                <CardTitle className="text-amber-100">Leaderboard - All Investigators</CardTitle>
               </div>
+              <CardDescription className="text-slate-400">
+                {leaderboard.length} total {leaderboard.length === 1 ? 'investigator' : 'investigators'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {leaderboard.slice(0, 10).map((entry, idx) => (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {leaderboard.map((entry, idx) => (
                   <div 
                     key={idx} 
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      entry.playerName === playerName.trim() 
-                        ? 'bg-amber-900/20 border border-amber-700' 
-                        : 'bg-slate-800/30'
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                      entry.playerName === playerName.trim() && showLeaderboard
+                        ? 'bg-amber-900/30 border-2 border-amber-600 animate-in fade-in duration-500' 
+                        : 'bg-slate-800/30 border border-slate-700/50'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`text-lg font-bold ${
+                      <span className={`text-base font-bold min-w-[2.5rem] ${
                         idx === 0 ? 'text-yellow-400' : 
                         idx === 1 ? 'text-slate-300' : 
                         idx === 2 ? 'text-amber-600' : 'text-slate-500'
                       }`}>
                         #{idx + 1}
                       </span>
-                      <span className="text-slate-200 font-semibold">{entry.playerName}</span>
+                      <span className={`text-slate-200 font-semibold ${
+                        entry.playerName === playerName.trim() && showLeaderboard ? 'text-amber-200' : ''
+                      }`}>
+                        {entry.playerName}
+                        {entry.playerName === playerName.trim() && showLeaderboard && (
+                          <span className="ml-2 text-xs text-amber-400">(You)</span>
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-amber-300 font-bold">{entry.score}</span>
-                      <span className="text-slate-500 text-sm">{formatTime(entry.elapsedSeconds)}</span>
+                      <span className="text-amber-300 font-bold text-sm">{entry.score} pts</span>
+                      <span className="text-slate-500 text-xs font-mono">{formatTime(entry.elapsedSeconds)}</span>
                     </div>
                   </div>
                 ))}
