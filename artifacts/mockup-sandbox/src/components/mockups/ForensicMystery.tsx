@@ -77,6 +77,9 @@ export default function ForensicMystery() {
   const [zoomedDocument, setZoomedDocument] = useState<string | null>(null);
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [foundDiscrepancies, setFoundDiscrepancies] = useState(0);
+  const [selectedSample, setSelectedSample] = useState<string | null>(null);
+  const [examinedSamples, setExaminedSamples] = useState<string[]>([]);
+  const [draggedEvent, setDraggedEvent] = useState<TimelineEvent | null>(null);
 
   const evidenceList: Record<string, Evidence> = {
     'label-discrepancy': {
@@ -608,53 +611,112 @@ export default function ForensicMystery() {
         <CardHeader>
           <CardTitle className="text-amber-100">Evidence Examination</CardTitle>
           <CardDescription className="text-slate-400">
-            Four containers sit in a row: A-12, B-07, S-17, and C-03
+            Click on each sample container to examine. Find the discrepancy to proceed.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="text-xs text-slate-500 mb-3">
+            Examined: {examinedSamples.length}/4 samples
+          </div>
+          
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            <div 
+              className={`p-4 bg-slate-800/50 rounded-lg border transition-all cursor-pointer ${
+                selectedSample === 'A-12' ? 'border-amber-600 ring-2 ring-amber-600/50' : 'border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => examineSample('A-12')}
+            >
               <div className="text-sm font-semibold text-amber-300 mb-2">Sample A-12</div>
-              <Badge className="bg-blue-900/50 text-blue-200 border-blue-700">Blue Label</Badge>
-              <p className="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+              {examinedSamples.includes('A-12') ? (
+                <>
+                  <Badge className="bg-blue-900/50 text-blue-200 border-blue-700">Blue Label</Badge>
+                  <p className="text-xs text-slate-400 mt-2">✓ Consistent in all records</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine</p>
+              )}
             </div>
-            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            
+            <div 
+              className={`p-4 bg-slate-800/50 rounded-lg border transition-all cursor-pointer ${
+                selectedSample === 'B-07' ? 'border-amber-600 ring-2 ring-amber-600/50' : 'border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => examineSample('B-07')}
+            >
               <div className="text-sm font-semibold text-amber-300 mb-2">Sample B-07</div>
-              <Badge className="bg-slate-700 text-slate-200 border-slate-600">White Label</Badge>
-              <p className="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+              {examinedSamples.includes('B-07') ? (
+                <>
+                  <Badge className="bg-slate-700 text-slate-200 border-slate-600">White Label</Badge>
+                  <p className="text-xs text-slate-400 mt-2">✓ Consistent in all records</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine</p>
+              )}
             </div>
-            <div className="p-4 bg-amber-950/30 rounded-lg border-2 border-amber-700">
-              <div className="text-sm font-semibold text-amber-200 mb-2">Sample S-17 ⚠️</div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-slate-700 text-slate-200 border-slate-600 text-xs">Original: White</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-900/50 text-blue-200 border-blue-700 text-xs">Register: Blue</Badge>
-                </div>
-              </div>
-              <p className="text-xs text-amber-300 mt-2 font-semibold">DISCREPANCY DETECTED</p>
+            
+            <div 
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                selectedSample === 'S-17' 
+                  ? 'bg-amber-950/50 border-amber-600 ring-2 ring-amber-600/50' 
+                  : examinedSamples.includes('S-17')
+                    ? 'bg-amber-950/30 border-amber-700 hover:border-amber-600'
+                    : 'bg-slate-800/50 border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => examineSample('S-17')}
+            >
+              <div className="text-sm font-semibold text-amber-200 mb-2">Sample S-17 {examinedSamples.includes('S-17') && '⚠️'}</div>
+              {examinedSamples.includes('S-17') ? (
+                <>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-slate-700 text-slate-200 border-slate-600 text-xs">Original: White</Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-blue-900/50 text-blue-200 border-blue-700 text-xs">Register: Blue</Badge>
+                    </div>
+                  </div>
+                  <p className="text-xs text-amber-300 mt-2 font-semibold">⚠️ DISCREPANCY DETECTED</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine</p>
+              )}
             </div>
-            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            
+            <div 
+              className={`p-4 bg-slate-800/50 rounded-lg border transition-all cursor-pointer ${
+                selectedSample === 'C-03' ? 'border-amber-600 ring-2 ring-amber-600/50' : 'border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => examineSample('C-03')}
+            >
               <div className="text-sm font-semibold text-amber-300 mb-2">Sample C-03</div>
-              <Badge className="bg-green-900/50 text-green-200 border-green-700">Green Label</Badge>
-              <p className="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+              {examinedSamples.includes('C-03') ? (
+                <>
+                  <Badge className="bg-green-900/50 text-green-200 border-green-700">Green Label</Badge>
+                  <p className="text-xs text-slate-400 mt-2">✓ Consistent in all records</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine</p>
+              )}
             </div>
           </div>
 
-          <Alert className="bg-amber-950/30 border-amber-900/50">
-            <AlertCircle className="h-4 w-4 text-amber-500" />
-            <AlertDescription className="text-slate-300">
-              <strong className="text-amber-200">Shoeprint Analysis:</strong> Pattern consistent with footwear 
-              recorded for Kabir. Combined with access timeline, this becomes relevant to the investigation.
-            </AlertDescription>
-          </Alert>
+          {examinedSamples.includes('S-17') && (
+            <>
+              <Alert className="bg-amber-950/30 border-amber-900/50 animate-in fade-in duration-500">
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+                <AlertDescription className="text-slate-300">
+                  <strong className="text-amber-200">Shoeprint Analysis:</strong> Pattern consistent with footwear 
+                  recorded for Kabir. Combined with access timeline, this becomes relevant to the investigation.
+                </AlertDescription>
+              </Alert>
 
-          <Alert className="bg-slate-800/50 border-slate-700">
-            <AlertDescription className="text-slate-400 text-sm">
-              <strong>Fingerprint Analysis:</strong> Result marked inconclusive. Cannot be used as proof of identity.
-            </AlertDescription>
-          </Alert>
+              <Alert className="bg-slate-800/50 border-slate-700">
+                <AlertDescription className="text-slate-400 text-sm">
+                  <strong>Fingerprint Analysis:</strong> Result marked inconclusive. Cannot be used as proof of identity.
+                </AlertDescription>
+              </Alert>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -671,9 +733,10 @@ export default function ForensicMystery() {
             setCurrentScene('puzzle');
             addToNotebook('Need to unlock cabinet records - puzzles required');
           }}
-          className="flex-1 bg-amber-700 hover:bg-amber-600"
+          disabled={!examinedSamples.includes('S-17')}
+          className="flex-1 bg-amber-700 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Unlock Cabinet Records
+          {examinedSamples.includes('S-17') ? 'Unlock Cabinet Records' : 'Examine S-17 to Continue'}
         </Button>
       </div>
     </div>
@@ -819,65 +882,85 @@ export default function ForensicMystery() {
 
       <Card className="bg-slate-900/50 border-amber-900/30">
         <CardHeader>
-          <CardTitle className="text-amber-100">Access Log Timeline - Drag to Order</CardTitle>
+          <CardTitle className="text-amber-100">Access Log Timeline - Drag to Reorder</CardTitle>
           <CardDescription className="text-slate-400">
-            {timelineOrdered ? 'Timeline correctly ordered!' : 'Drag events into chronological order'}
+            {timelineOrdered ? '✓ Timeline correctly ordered!' : 'Drag and drop events into chronological order'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!timelineOrdered && (
-            <Button 
-              onClick={() => setDraggedEvents(shuffleArray(draggedEvents))}
-              variant="outline"
-              size="sm"
-              className="mb-2 border-slate-700 text-slate-400"
-            >
-              Shuffle Events
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setDraggedEvents(shuffleArray([...timelineEvents]))}
+                variant="outline"
+                size="sm"
+                className="border-slate-700 text-slate-400 hover:bg-slate-800"
+              >
+                🔀 Shuffle Events
+              </Button>
+              <Alert className="flex-1 bg-blue-950/20 border-blue-900/40 py-2">
+                <AlertDescription className="text-xs text-blue-200">
+                  Drag any event onto another to swap their positions
+                </AlertDescription>
+              </Alert>
+            </div>
           )}
 
           <div className="space-y-3">
             {(timelineOrdered ? timelineEvents : draggedEvents).map((event, idx) => (
               <div 
                 key={event.id} 
-                className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-amber-700/50 transition-all"
+                draggable={!timelineOrdered}
+                onDragStart={() => !timelineOrdered && handleDragStart(event)}
+                onDragOver={(e) => !timelineOrdered && e.preventDefault()}
+                onDrop={() => !timelineOrdered && handleDrop(event)}
+                className={`p-4 bg-slate-800/50 rounded-lg border transition-all ${
+                  !timelineOrdered 
+                    ? 'border-slate-700 hover:border-amber-700/50 cursor-move active:opacity-50' 
+                    : 'border-green-700/50'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-amber-300 border-amber-700 font-mono">
+                    <Badge variant="outline" className="text-amber-300 border-amber-700 font-mono text-xs">
                       {event.time}
                     </Badge>
-                    <span className="text-slate-300">{event.event}</span>
+                    <span className="text-slate-300 text-sm">{event.event}</span>
                   </div>
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  {timelineOrdered && <CheckCircle className="h-4 w-4 text-green-500" />}
+                  {!timelineOrdered && <span className="text-slate-600 text-xs">#{idx + 1}</span>}
                 </div>
               </div>
             ))}
           </div>
 
-          <Alert className="bg-red-950/30 border-red-900/50">
-            <AlertCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-slate-300">
-              <strong className="text-red-300">Timeline Contradiction:</strong> Account K-02 (Kabir) accessed 
-              the storage cabinet at 14:18, <strong>after</strong> the tray was marked ready at 14:14. 
-              Kabir claimed he completed his work <strong>before</strong> the tray was ready.
-            </AlertDescription>
-          </Alert>
+          {timelineOrdered && (
+            <>
+              <Alert className="bg-red-950/30 border-red-900/50 animate-in fade-in duration-500">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertDescription className="text-slate-300">
+                  <strong className="text-red-300">Timeline Contradiction:</strong> Account K-02 (Kabir) accessed 
+                  the storage cabinet at 14:18, <strong>after</strong> the tray was marked ready at 14:14. 
+                  Kabir claimed he completed his work <strong>before</strong> the tray was ready.
+                </AlertDescription>
+              </Alert>
 
-          <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/50">
-            <h4 className="text-amber-200 font-semibold mb-2">Account Permissions</h4>
-            <p className="text-slate-300 text-sm">Account K-02 is registered to: <strong className="text-amber-300">Kabir</strong></p>
-            <p className="text-slate-400 text-sm mt-1">
-              Same account edited the digital register at 14:26, changing S-17 label from white to blue.
-            </p>
-          </div>
+              <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/50">
+                <h4 className="text-amber-200 font-semibold mb-2 text-sm">Account Permissions</h4>
+                <p className="text-slate-300 text-sm">Account K-02 is registered to: <strong className="text-amber-300">Kabir</strong></p>
+                <p className="text-slate-400 text-xs mt-1">
+                  Same account edited the digital register at 14:26, changing S-17 label from white to blue.
+                </p>
+              </div>
+            </>
+          )}
 
           {!timelineOrdered && (
             <Button 
               onClick={handleTimelineSubmit}
               className="w-full bg-green-700 hover:bg-green-600"
             >
-              Verify Timeline Order
+              ✓ Submit Timeline Order
             </Button>
           )}
         </CardContent>
@@ -897,9 +980,9 @@ export default function ForensicMystery() {
             discoverEvidence('torn-label');
           }}
           disabled={!timelineComplete}
-          className="flex-1 bg-amber-700 hover:bg-amber-600"
+          className="flex-1 bg-amber-700 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Examine Register History
+          {timelineComplete ? 'Examine Register History' : 'Order Timeline First'}
         </Button>
       </div>
     </div>
@@ -1359,6 +1442,35 @@ export default function ForensicMystery() {
       setTimelineComplete(true);
       addToNotebook('Timeline ordered correctly - K-02 accessed cabinet AFTER tray marked ready');
       discoverEvidence('register-history');
+    }
+  };
+
+  const handleDragStart = (event: TimelineEvent) => {
+    setDraggedEvent(event);
+  };
+
+  const handleDrop = (targetEvent: TimelineEvent) => {
+    if (!draggedEvent) return;
+    
+    const draggedIdx = draggedEvents.findIndex(e => e.id === draggedEvent.id);
+    const targetIdx = draggedEvents.findIndex(e => e.id === targetEvent.id);
+    
+    const newEvents = [...draggedEvents];
+    newEvents[draggedIdx] = targetEvent;
+    newEvents[targetIdx] = draggedEvent;
+    
+    setDraggedEvents(newEvents);
+    setDraggedEvent(null);
+  };
+
+  const examineSample = (sampleId: string) => {
+    setSelectedSample(sampleId);
+    if (!examinedSamples.includes(sampleId)) {
+      setExaminedSamples([...examinedSamples, sampleId]);
+      if (sampleId === 'S-17') {
+        addToNotebook('S-17 shows WHITE label physically, but BLUE in digital register');
+        discoverEvidence('shoeprint');
+      }
     }
   };
 
