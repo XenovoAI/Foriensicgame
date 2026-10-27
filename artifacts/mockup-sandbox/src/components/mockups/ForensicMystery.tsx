@@ -39,6 +39,15 @@ interface GameAnalytics {
   averageScore: number;
 }
 
+// Define timeline events before component to avoid circular reference
+const timelineEvents: TimelineEvent[] = [
+  { id: '1', time: '14:05', event: 'Riya signs the tray preparation sheet' },
+  { id: '2', time: '14:10', event: 'Sana records that S-17\'s label looks newer' },
+  { id: '3', time: '14:14', event: 'Demonstration tray marked ready' },
+  { id: '4', time: '14:18', event: 'Account K-02 accesses storage cabinet' },
+  { id: '5', time: '14:26', event: 'Digital register exported with S-17 label changed' }
+];
+
 export default function ForensicMystery() {
   const [currentScene, setCurrentScene] = useState<Scene>('intro');
   const [discoveredEvidence, setDiscoveredEvidence] = useState<string[]>([]);
@@ -96,14 +105,6 @@ export default function ForensicMystery() {
       description: 'Blue label fragment found with torn edge, consistent with S-17 label.'
     }
   };
-
-  const timelineEvents: TimelineEvent[] = [
-    { id: '1', time: '14:05', event: 'Riya signs the tray preparation sheet' },
-    { id: '2', time: '14:10', event: 'Sana records that S-17\'s label looks newer' },
-    { id: '3', time: '14:14', event: 'Demonstration tray marked ready' },
-    { id: '4', time: '14:18', event: 'Account K-02 accesses storage cabinet' },
-    { id: '5', time: '14:26', event: 'Digital register exported with S-17 label changed' }
-  ];
 
   // Timer effect
   useEffect(() => {
