@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE FILE TS-0418 - The Switched Sample</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.7s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .scene-transition {
+            animation: sceneTransition 0.5s ease-out;
+        }
+        @keyframes sceneTransition {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen">
+    <div id="app" class="max-w-4xl mx-auto p-6"></div>
+
+    <script>
+        const state = {
+            currentScene: 'intro',
+            discoveredEvidence: [],
+            selectedSuspect: null,
+            timelineComplete: false,
+            caseNotebook: []
+        };
+
+        const evidence = {
+            'label-discrepancy': {
+                name: 'Label Discrepancy',
+                description: 'Sample S-17 shows white label in original notes, blue label in digital register.'
+            },
+            'access-log': {
+                name: 'Access Log Entry',
+                description: 'Account K-02 accessed storage cabinet at 14:18, after tray was marked ready at 14:14.'
+            },
+            'register-history': {
+                name: 'Register Version History',
+                description: 'Digital register changed from white to blue label at 14:26 under account K-02.'
+            },
+            'shoeprint': {
+                name: 'Shoeprint Match',
+                description: 'Shoeprint pattern consistent with Kabir\'s recorded footwear.'
+            }
+        };
+
+        const timelineEvents = [
+            { time: '14:05', event: 'Riya signs the tray preparation sheet' },
+            { time: '14:10', event: 'Sana records that S-17\'s label looks newer' },
+            { time: '14:14', event: 'Demonstration tray marked ready' },
+            { time: '14:18', event: 'Account K-02 accesses storage cabinet' },
+            { time: '14:26', event: 'Digital register exported with S-17 label changed' }
+        ];
+
+        function addToNotebook(note) {
+            if (!state.caseNotebook.includes(note)) {
+                state.caseNotebook.push(note);
+                render();
+            }
+        }
+
+        function discoverEvidence(evidenceId) {
+            if (!state.discoveredEvidence.includes(evidenceId)) {
+                state.discoveredEvidence.push(evidenceId);
+                addToNotebook(`Evidence discovered: ${evidence[evidenceId].name}`);
+            }
+        }
+
+        function setScene(scene) {
+            state.currentScene = scene;
+            render();
+        }
+
+        function selectSuspect(suspect) {
+            state.selectedSuspect = suspect;
+            render();
+        }
+
+        function renderIntro() {
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="text-center space-y-2">
+                        <h1 class="text-4xl font-bold text-amber-200 tracking-wide">CASE FILE TS-0418</h1>
+                        <h2 class="text-2xl text-amber-100">THE SWITCHED SAMPLE</h2>
+                        <span class="inline-block bg-red-900/50 text-red-200 border border-red-700 px-3 py-1 rounded text-sm">RESTRICTED INVESTIGATION FILE</span>
+                    </div>
+
+                    <div class="bg-slate-900/50 border border-amber-900/30 rounded-lg overflow-hidden">
+                        <div class="p-6 border-b border-amber-900/30">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <h3 class="text-xl font-semibold text-amber-100">Scene 1: The Sample That Should Not Exist</h3>
+                            </div>
+                            <p class="text-slate-400 text-sm">14:32 PM — Northwell Forensic Laboratory</p>
+                        </div>
+                        <div class="p-6 space-y-4 text-slate-300">
+                            <p>
+                                The laboratory is unusually quiet. A digital clock flickers above the examination room. 
+                                Everything appears normal—until a junior laboratory assistant notices something strange in the records.
+                            </p>
+                            <p>
+                                Sample S-17 has been marked as sealed, verified, and ready for examination. But there is a problem. 
+                                The sample's identification label does not match the original laboratory notes.
+                            </p>
+                            
+                            <div class="bg-amber-950/30 border border-amber-900/50 rounded-lg p-4">
+                                <div class="flex items-start gap-2">
+                                    <svg class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                    <div>
+                                        <strong class="text-amber-200">Discovery:</strong> The original preparation sheet identifies S-17 with a 
+                                        <span class="font-semibold"> white label</span>. The later digital register identifies it with a 
+                                        <span class="font-semibold"> blue label</span>.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-sm italic text-slate-400">
+                                The register was updated after the sample tray had already been marked ready. 
+                                Someone may have altered the record...
+                            </p>
+
+                            <div class="pt-4">
+                                <button 
+                                    onclick="discoverEvidence('label-discrepancy'); setScene('suspects');"
+                                    class="w-full bg-amber-700 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                                    Begin Investigation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuspects() {
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <h2 class="text-2xl font-bold text-amber-100">Scene 2: Three People. Three Stories.</h2>
+                        </div>
+                        <span class="text-amber-300 border border-amber-700 px-3 py-1 rounded text-sm">
+                            ${state.discoveredEvidence.length} Evidence Found
+                        </span>
+                    </div>
+
+                    <div class="space-y-4">
+                        ${renderSuspectCard('riya', 'Suspect 01 — RIYA', 'Lab Assistant',
+                            '"I finished preparing the tray before the final access entry. The labels were checked before the demonstration. I didn\'t edit the digital register."',
+                            'Sample preparation area',
+                            'Early preparation stage',
+                            'Reviewed Riya\'s statement - prepared tray, completed paperwork')}
+                        
+                        ${renderSuspectCard('sana', 'Suspect 02 — SANA', 'Student Researcher',
+                            '"I thought it was unusual, but I didn\'t want to make an accusation without evidence. I didn\'t open the storage cabinet."',
+                            'Equipment check area',
+                            'First to notice discrepancy',
+                            'Reviewed Sana\'s statement - noticed unusual label, didn\'t open cabinet')}
+                        
+                        ${renderSuspectCard('kabir', 'Suspect 03 — KABIR', 'Project Coordinator',
+                            '"I completed my inventory work before the tray was marked ready. I didn\'t change the sample."',
+                            'Storage cabinet (Account K-02)',
+                            'Inventory management',
+                            'Reviewed Kabir\'s statement - claims inventory work completed before tray ready')}
+                    </div>
+
+                    <div class="flex gap-3 mt-6">
+                        <button 
+                            onclick="setScene('intro');"
+                            class="border border-amber-800 text-amber-300 hover:bg-amber-950 font-semibold py-3 px-6 rounded-lg transition-colors">
+                            Previous Scene
+                        </button>
+                        <button 
+                            onclick="discoverEvidence('shoeprint'); setScene('evidence');"
+                            ${!state.selectedSuspect ? 'disabled class="bg-slate-700 text-slate-500 cursor-not-allowed font-semibold py-3 px-6 rounded-lg flex-1"' : 'class="flex-1 bg-amber-700 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"'}>
+                            Examine Physical Evidence
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuspectCard(id, title, role, statement, access, note, notebookEntry) {
+            const isSelected = state.selectedSuspect === id;
+            return `
+                <div 
+                    onclick="selectSuspect('${id}'); addToNotebook('${notebookEntry}');"
+                    class="bg-slate-900/50 border ${isSelected ? 'border-amber-600 ring-2 ring-amber-600/50' : 'border-amber-900/30 hover:border-amber-700/50'} rounded-lg p-6 cursor-pointer transition-all">
+                    <div class="flex items-center gap-2 mb-3">
+                        <h3 class="text-xl font-semibold text-amber-100">${title}</h3>
+                        <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs">${role}</span>
+                    </div>
+                    <p class="text-slate-300 mb-3">${statement}</p>
+                    <div class="text-sm text-slate-400 space-y-1">
+                        <p><strong class="text-amber-300">Access:</strong> ${access}</p>
+                        <p><strong class="text-amber-300">Note:</strong> ${note}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEvidence() {
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h2 class="text-2xl font-bold text-amber-100">Scene 3: Physical Evidence Analysis</h2>
+                    </div>
+
+                    <div class="bg-slate-900/50 border border-amber-900/30 rounded-lg overflow-hidden">
+                        <div class="p-6 border-b border-amber-900/30">
+                            <h3 class="text-xl font-semibold text-amber-100 mb-1">Evidence Examination</h3>
+                            <p class="text-slate-400 text-sm">Four containers sit in a row: A-12, B-07, S-17, and C-03</p>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                                    <div class="text-sm font-semibold text-amber-300 mb-2">Sample A-12</div>
+                                    <span class="inline-block bg-blue-900/50 text-blue-200 border border-blue-700 px-2 py-1 rounded text-xs">Blue Label</span>
+                                    <p class="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                                    <div class="text-sm font-semibold text-amber-300 mb-2">Sample B-07</div>
+                                    <span class="inline-block bg-slate-700 text-slate-200 border border-slate-600 px-2 py-1 rounded text-xs">White Label</span>
+                                    <p class="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+                                </div>
+                                <div class="p-4 bg-amber-950/30 rounded-lg border-2 border-amber-700">
+                                    <div class="text-sm font-semibold text-amber-200 mb-2">Sample S-17 ⚠️</div>
+                                    <div class="space-y-1">
+                                        <div><span class="inline-block bg-slate-700 text-slate-200 border border-slate-600 px-2 py-1 rounded text-xs">Original: White</span></div>
+                                        <div><span class="inline-block bg-blue-900/50 text-blue-200 border border-blue-700 px-2 py-1 rounded text-xs">Register: Blue</span></div>
+                                    </div>
+                                    <p class="text-xs text-amber-300 mt-2 font-semibold">DISCREPANCY DETECTED</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                                    <div class="text-sm font-semibold text-amber-300 mb-2">Sample C-03</div>
+                                    <span class="inline-block bg-green-900/50 text-green-200 border border-green-700 px-2 py-1 rounded text-xs">Green Label</span>
+                                    <p class="text-xs text-slate-400 mt-2">Consistent in all records ✓</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-amber-950/30 border border-amber-900/50 rounded-lg p-4">
+                                <div class="flex items-start gap-2">
+                                    <svg class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                    <div class="text-slate-300">
+                                        <strong class="text-amber-200">Shoeprint Analysis:</strong> Pattern consistent with footwear 
+                                        recorded for Kabir. Combined with access timeline, this becomes relevant to the investigation.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                                <p class="text-slate-400 text-sm">
+                                    <strong>Fingerprint Analysis:</strong> Result marked inconclusive. Cannot be used as proof of identity.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button 
+                            onclick="setScene('suspects');"
+                            class="border border-amber-800 text-amber-300 hover:bg-amber-950 font-semibold py-3 px-6 rounded-lg transition-colors">
+                            Previous Scene
+                        </button>
+                        <button 
+                            onclick="discoverEvidence('access-log'); discoverEvidence('register-history'); setScene('timeline');"
+                            class="flex-1 bg-amber-700 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                            Review Access Timeline
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTimeline() {
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h2 class="text-2xl font-bold text-amber-100">Scene 4: The Missing Minutes</h2>
+                    </div>
+
+                    <div class="bg-slate-900/50 border border-amber-900/30 rounded-lg overflow-hidden">
+                        <div class="p-6 border-b border-amber-900/30">
+                            <h3 class="text-xl font-semibold text-amber-100 mb-1">Access Log Timeline</h3>
+                            <p class="text-slate-400 text-sm">Reconstruct the sequence of events</p>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="space-y-3">
+                                ${timelineEvents.map(event => `
+                                    <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-amber-700/50 transition-all">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-amber-300 border border-amber-700 px-2 py-1 rounded text-sm font-mono">${event.time}</span>
+                                                <span class="text-slate-300">${event.event}</span>
+                                            </div>
+                                            <svg class="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="bg-red-950/30 border border-red-900/50 rounded-lg p-4">
+                                <div class="flex items-start gap-2">
+                                    <svg class="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                    <div class="text-slate-300">
+                                        <strong class="text-red-300">Timeline Contradiction:</strong> Account K-02 (Kabir) accessed 
+                                        the storage cabinet at 14:18, <strong>after</strong> the tray was marked ready at 14:14. 
+                                        Kabir claimed he completed his work <strong>before</strong> the tray was ready.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-amber-950/20 rounded-lg border border-amber-900/50">
+                                <h4 class="text-amber-200 font-semibold mb-2">Account Permissions</h4>
+                                <p class="text-slate-300 text-sm">Account K-02 is registered to: <strong class="text-amber-300">Kabir</strong></p>
+                                <p class="text-slate-400 text-sm mt-1">
+                                    Same account edited the digital register at 14:26, changing S-17 label from white to blue.
+                                </p>
+                            </div>
+
+                            <button 
+                                onclick="state.timelineComplete = true; addToNotebook('Timeline analyzed - Kabir\\'s statement contradicted by access logs'); render();"
+                                class="w-full bg-green-700 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                                Timeline Analysis Complete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button 
+                            onclick="setScene('evidence');"
+                            class="border border-amber-800 text-amber-300 hover:bg-amber-950 font-semibold py-3 px-6 rounded-lg transition-colors">
+                            Previous Scene
+                        </button>
+                        <button 
+                            onclick="setScene('verdict');"
+                            ${!state.timelineComplete ? 'disabled class="bg-slate-700 text-slate-500 cursor-not-allowed font-semibold py-3 px-6 rounded-lg flex-1"' : 'class="flex-1 bg-amber-700 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"'}>
+                            Make Final Accusation
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVerdict() {
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="text-center space-y-2 mb-6">
+                        <h2 class="text-3xl font-bold text-amber-100">Scene 5: Final Verdict</h2>
+                        <p class="text-slate-400">Who switched the sample?</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        ${renderVerdictCard('kabir', 'KABIR - Project Coordinator', [
+                            '✓ Account K-02 accessed cabinet at 14:18 (after tray marked ready)',
+                            '✓ Same account changed register at 14:26 (white → blue label)',
+                            '✓ Statement contradicted by timeline',
+                            '✓ Shoeprint pattern matches recorded footwear'
+                        ], true)}
+
+                        ${renderVerdictCard('riya', 'RIYA - Lab Assistant', [
+                            '• Statement consistent with early preparation records',
+                            '• No access during suspicious timeframe',
+                            '• Timeline supports her account'
+                        ], false)}
+
+                        ${renderVerdictCard('sana', 'SANA - Student Researcher', [
+                            '• First to notice the discrepancy (witness)',
+                            '• No cabinet access recorded',
+                            '• No contradictions in statement'
+                        ], false)}
+                    </div>
+
+                    ${state.selectedSuspect ? `
+                        <div class="bg-slate-900/50 border border-amber-900/30 rounded-lg overflow-hidden">
+                            <div class="p-6 border-b border-amber-900/30">
+                                <h3 class="text-xl font-semibold text-amber-100">Supporting Evidence</h3>
+                            </div>
+                            <div class="p-6 space-y-2">
+                                ${state.discoveredEvidence.map(evId => {
+                                    const ev = evidence[evId];
+                                    return `
+                                        <div class="flex items-start gap-2 text-sm">
+                                            <svg class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <div>
+                                                <div class="text-amber-300 font-semibold">${ev.name}</div>
+                                                <div class="text-slate-400">${ev.description}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="flex gap-3">
+                        <button 
+                            onclick="setScene('timeline');"
+                            class="border border-amber-800 text-amber-300 hover:bg-amber-950 font-semibold py-3 px-6 rounded-lg transition-colors">
+                            Review Timeline
+                        </button>
+                        <button 
+                            onclick="submitVerdict();"
+                            ${!state.selectedSuspect ? 'disabled class="bg-slate-700 text-slate-500 cursor-not-allowed font-semibold py-3 px-6 rounded-lg flex-1"' : 'class="flex-1 bg-red-700 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"'}>
+                            Submit Final Verdict
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVerdictCard(id, title, points, isCorrect) {
+            const isSelected = state.selectedSuspect === id;
+            const bgClass = isSelected && isCorrect ? 'bg-red-950/30 border-red-700 ring-2 ring-red-600/50' : 
+                           isSelected ? 'bg-blue-950/30 border-blue-700' :
+                           isCorrect ? 'bg-slate-900/50 border-amber-900/30 hover:border-amber-700/50' :
+                           'bg-slate-900/50 border-slate-700/30 opacity-60 hover:opacity-100';
+            
+            return `
+                <div
+                    onclick="selectSuspect('${id}');"
+                    class="${bgClass} rounded-lg p-6 cursor-pointer transition-all border-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-semibold text-amber-100">${title}</h3>
+                        ${isSelected ? '<span class="bg-red-900/50 text-red-200 border border-red-700 px-2 py-1 rounded text-xs">Selected</span>' : ''}
+                    </div>
+                    <div class="space-y-2 text-sm ${isCorrect ? 'text-slate-300' : 'text-slate-400'}">
+                        ${points.map(point => `<p>${point}</p>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitVerdict() {
+            if (state.selectedSuspect === 'kabir') {
+                alert('✓ CASE CLOSED · TS-0418\n\nTHE EVIDENCE HELD UP.\n\nKabir switched the sample. The shoeprint comparison and access timeline support the verdict. The register history reveals when the label changed, and the account record connects the edit to Kabir.\n\nYour investigation is complete.');
+            } else {
+                alert('✗ INCORRECT VERDICT\n\nThe evidence does not support this conclusion. Review the access timeline, register history, and timeline contradictions.');
+            }
+        }
+
+        function renderNotebook() {
+            if (state.currentScene === 'intro') return '';
+            
+            return `
+                <div class="mt-8 bg-slate-900/30 border border-amber-900/20 rounded-lg overflow-hidden">
+                    <div class="p-4 border-b border-amber-900/20">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <h3 class="text-sm font-semibold text-amber-100">Case Notebook</h3>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-2 max-h-32 overflow-y-auto">
+                            ${state.caseNotebook.length === 0 ? 
+                                '<p class="text-xs text-slate-500 italic">No notes yet...</p>' :
+                                state.caseNotebook.map(note => `
+                                    <div class="text-xs text-slate-400 flex items-start gap-2">
+                                        <span class="text-amber-600">•</span>
+                                        <span>${note}</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const sceneNumber = {
+                'intro': '1',
+                'suspects': '2',
+                'evidence': '3',
+                'timeline': '4',
+                'verdict': '5'
+            }[state.currentScene];
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="mb-8 pb-6 border-b border-amber-900/30">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-sm font-semibold text-amber-500 tracking-widest">NORTHWELL FORENSIC SERVICES</h1>
+                            <p class="text-xs text-slate-500 mt-1">Lead Investigator Interface</p>
+                        </div>
+                        <span class="text-amber-300 border border-amber-700 px-3 py-1 rounded text-sm">
+                            Scene ${sceneNumber} of 5
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-8 scene-transition">
+                    ${state.currentScene === 'intro' ? renderIntro() :
+                      state.currentScene === 'suspects' ? renderSuspects() :
+                      state.currentScene === 'evidence' ? renderEvidence() :
+                      state.currentScene === 'timeline' ? renderTimeline() :
+                      renderVerdict()}
+                </div>
+
+                ${renderNotebook()}
+            `;
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
