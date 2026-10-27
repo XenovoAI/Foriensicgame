@@ -5,15 +5,10 @@
       "root": "artifacts/api-server",
       "framework": "express"
     },
-    "mockup-sandbox": {
+    "forensic-mystery": {
       "root": "artifacts/mockup-sandbox",
       "framework": "vite",
       "outputDirectory": "dist"
-    },
-    "switched-sample": {
-      "root": "artifacts/switched-sample",
-      "framework": "vite",
-      "outputDirectory": "dist/public"
     }
   },
   "rewrites": [
@@ -26,7 +21,7 @@
     {
       "source": "/(.*)",
       "destination": {
-        "service": "switched-sample"
+        "service": "forensic-mystery"
       }
     }
   ]
