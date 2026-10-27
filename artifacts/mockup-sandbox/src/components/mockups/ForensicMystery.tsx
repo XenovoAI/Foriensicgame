@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle, BookOpen, CheckCircle, Clock, FileText, Users, Trophy, Timer, Play, Lock, Code, ArrowUpDown, History, BarChart3, Target } from 'lucide-react';
+import { AlertCircle, BookOpen, CheckCircle, Clock, FileText, Users, Trophy, Timer, Play, Lock, Code, ArrowUpDown, History, BarChart3, Target, Search, ZoomIn, Highlighter, FileCheck } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -65,6 +65,9 @@ export default function ForensicMystery() {
   ]);
   const [morseInput, setMorseInput] = useState('');
   const [draggedEvents, setDraggedEvents] = useState<TimelineEvent[]>([...timelineEvents]);
+  const [zoomedDocument, setZoomedDocument] = useState<string | null>(null);
+  const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
+  const [foundDiscrepancies, setFoundDiscrepancies] = useState(0);
 
   const evidenceList: Record<string, Evidence> = {
     'label-discrepancy': {
@@ -218,6 +221,20 @@ export default function ForensicMystery() {
     }
   };
 
+  const highlightField = (fieldId: string) => {
+    if (!highlightedFields.includes(fieldId)) {
+      setHighlightedFields([...highlightedFields, fieldId]);
+      const discrepancyFields = ['label-original', 'label-digital', 'timestamp-conflict'];
+      if (discrepancyFields.includes(fieldId)) {
+        const newCount = foundDiscrepancies + 1;
+        setFoundDiscrepancies(newCount);
+        if (newCount === 1) addToNotebook('Found: Original prep sheet marked WHITE label');
+        if (newCount === 2) addToNotebook('Found: Digital register shows BLUE label');
+        if (newCount === 3) addToNotebook('Found: Register updated AFTER tray marked ready (suspicious timing)');
+      }
+    }
+  };
+
   const renderIntro = () => (
     <div className="space-y-6 animate-in fade-in duration-700">
       <div className="text-center space-y-2">
@@ -244,32 +261,192 @@ export default function ForensicMystery() {
             The sample's identification label does not match the original laboratory notes.
           </p>
           
-          <Alert className="bg-amber-950/30 border-amber-900/50">
-            <AlertCircle className="h-4 w-4 text-amber-500" />
+          <Alert className="bg-red-950/30 border-red-900/50">
+            <Search className="h-4 w-4 text-red-500" />
             <AlertDescription className="text-slate-300">
-              <strong className="text-amber-200">Discovery:</strong> The original preparation sheet identifies S-17 with a 
-              <span className="font-semibold"> white label</span>. The later digital register identifies it with a 
-              <span className="font-semibold"> blue label</span>.
+              <strong className="text-red-300">Your Task:</strong> Examine the laboratory register below. 
+              Find and highlight <strong>3 discrepancies</strong> to proceed with the investigation.
             </AlertDescription>
           </Alert>
 
-          <p className="text-sm italic text-slate-400">
-            The register was updated after the sample tray had already been marked ready. 
-            Someone may have altered the record...
-          </p>
+          <div className="p-4 bg-slate-800/30 rounded border border-slate-700 text-xs text-slate-400 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Highlighter className="h-4 w-4 text-amber-500" />
+              <span>Discrepancies Found: <strong className="text-amber-300">{foundDiscrepancies}/3</strong></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FileCheck className="h-4 w-4 text-green-500" />
+              <span>Saved to Notebook: {foundDiscrepancies}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-          <div className="pt-4">
+      {/* Interactive Laboratory Register */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card 
+          className={`bg-slate-900/50 border-amber-900/30 cursor-pointer transition-all hover:border-amber-700 ${
+            zoomedDocument === 'original' ? 'ring-2 ring-amber-600' : ''
+          }`}
+          onClick={() => setZoomedDocument(zoomedDocument === 'original' ? null : 'original')}
+        >
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm text-amber-100">Original Preparation Sheet</CardTitle>
+              <ZoomIn className="h-4 w-4 text-amber-500" />
+            </div>
+            <CardDescription className="text-xs text-slate-500">Completed 14:10 — Riya (Lab Assistant)</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-slate-800/50 rounded border border-slate-700 font-mono text-xs">
+              <div className="text-slate-500 mb-2">NORTHWELL FORENSIC SERVICES</div>
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Sample ID:</span>
+                  <span className="text-slate-200">S-17</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-green-400">SEALED</span>
+                </div>
+                <div 
+                  className={`flex justify-between p-2 rounded cursor-pointer transition-all ${
+                    highlightedFields.includes('label-original') 
+                      ? 'bg-yellow-900/30 border border-yellow-600' 
+                      : 'hover:bg-slate-700/50'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    highlightField('label-original');
+                  }}
+                >
+                  <span className="text-slate-400">Label Color:</span>
+                  <span className="text-slate-200 font-bold">WHITE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Prepared:</span>
+                  <span className="text-slate-200">14:10</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Ready:</span>
+                  <span className="text-amber-400">14:14</span>
+                </div>
+              </div>
+            </div>
+            {highlightedFields.includes('label-original') && (
+              <div className="flex items-center gap-2 text-xs text-green-400">
+                <CheckCircle className="h-3 w-3" />
+                <span>Saved: WHITE label in original notes</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={`bg-slate-900/50 border-amber-900/30 cursor-pointer transition-all hover:border-amber-700 ${
+            zoomedDocument === 'digital' ? 'ring-2 ring-amber-600' : ''
+          }`}
+          onClick={() => setZoomedDocument(zoomedDocument === 'digital' ? null : 'digital')}
+        >
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm text-amber-100">Digital Register</CardTitle>
+              <ZoomIn className="h-4 w-4 text-amber-500" />
+            </div>
+            <CardDescription className="text-xs text-slate-500">Last Modified 14:26 — K-02 (Unknown)</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-slate-800/50 rounded border border-slate-700 font-mono text-xs">
+              <div className="text-slate-500 mb-2">DIGITAL EVIDENCE REGISTER</div>
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Sample ID:</span>
+                  <span className="text-slate-200">S-17</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-green-400">VERIFIED</span>
+                </div>
+                <div 
+                  className={`flex justify-between p-2 rounded cursor-pointer transition-all ${
+                    highlightedFields.includes('label-digital') 
+                      ? 'bg-yellow-900/30 border border-yellow-600' 
+                      : 'hover:bg-slate-700/50'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    highlightField('label-digital');
+                  }}
+                >
+                  <span className="text-slate-400">Label Color:</span>
+                  <span className="text-blue-400 font-bold">BLUE</span>
+                </div>
+                <div 
+                  className={`flex justify-between p-2 rounded cursor-pointer transition-all ${
+                    highlightedFields.includes('timestamp-conflict') 
+                      ? 'bg-red-900/30 border border-red-600' 
+                      : 'hover:bg-slate-700/50'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    highlightField('timestamp-conflict');
+                  }}
+                >
+                  <span className="text-slate-400">Last Edit:</span>
+                  <span className="text-red-400 font-bold">14:26 ⚠️</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Editor:</span>
+                  <span className="text-amber-400">K-02</span>
+                </div>
+              </div>
+            </div>
+            {highlightedFields.includes('label-digital') && (
+              <div className="flex items-center gap-2 text-xs text-green-400">
+                <CheckCircle className="h-3 w-3" />
+                <span>Saved: BLUE label in digital register</span>
+              </div>
+            )}
+            {highlightedFields.includes('timestamp-conflict') && (
+              <div className="flex items-center gap-2 text-xs text-green-400">
+                <CheckCircle className="h-3 w-3" />
+                <span>Saved: Edited AFTER tray ready (14:14)</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {foundDiscrepancies === 3 && (
+        <Alert className="bg-green-950/30 border-green-900/50 animate-in fade-in duration-500">
+          <CheckCircle className="h-4 w-4 text-green-500" />
+          <AlertDescription className="text-slate-300">
+            <strong className="text-green-400">All Discrepancies Found!</strong> You've identified the key evidence:
+            WHITE label changed to BLUE, and the register was modified after the tray was marked ready.
+            This is not a clerical error — someone deliberately altered the record.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <Card className="bg-slate-900/50 border-amber-900/30">
+        <CardContent className="pt-6">
+          <div className="space-y-3">
+            <p className="text-sm text-slate-400 italic">
+              Click on the documents to zoom. Click highlighted fields to mark them as suspicious and save to your notebook.
+              Find all 3 discrepancies to proceed with the investigation.
+            </p>
             <Button 
               onClick={() => {
                 setStartTime(Date.now());
                 setCurrentScene('suspects');
                 discoverEvidence('label-discrepancy');
               }}
-              className="w-full bg-amber-700 hover:bg-amber-600"
+              disabled={foundDiscrepancies < 3}
+              className="w-full bg-amber-700 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
               size="lg"
             >
               <Play className="h-4 w-4 mr-2" />
-              Begin Investigation
+              {foundDiscrepancies < 3 ? `Find ${3 - foundDiscrepancies} More Discrepancies` : 'Begin Full Investigation'}
             </Button>
           </div>
         </CardContent>
