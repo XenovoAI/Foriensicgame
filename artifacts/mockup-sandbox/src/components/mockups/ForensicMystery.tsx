@@ -80,6 +80,9 @@ export default function ForensicMystery() {
   const [selectedSample, setSelectedSample] = useState<string | null>(null);
   const [examinedSamples, setExaminedSamples] = useState<string[]>([]);
   const [draggedEvent, setDraggedEvent] = useState<TimelineEvent | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+  const [comparedVersions, setComparedVersions] = useState<number[]>([]);
+  const [discoveredRegisterEvidence, setDiscoveredRegisterEvidence] = useState(false);
 
   const evidenceList: Record<string, Evidence> = {
     'label-discrepancy': {
@@ -999,67 +1002,127 @@ export default function ForensicMystery() {
         <CardHeader>
           <CardTitle className="text-amber-100">Digital Register Version History</CardTitle>
           <CardDescription className="text-slate-400">
-            Compare three saved versions of Sample S-17 record
+            Click on each version to examine. Compare all 3 versions to proceed.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="text-xs text-slate-500 mb-3">
+            Examined: {comparedVersions.length}/3 versions
+          </div>
+
           <div className="space-y-3">
-            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            {/* Version 1 */}
+            <div 
+              className={`p-4 rounded-lg border transition-all cursor-pointer ${
+                selectedVersion === 1 
+                  ? 'bg-slate-800/70 border-amber-600 ring-2 ring-amber-600/50' 
+                  : comparedVersions.includes(1)
+                    ? 'bg-slate-800/50 border-slate-600'
+                    : 'bg-slate-800/30 border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => selectVersion(1)}
+            >
               <div className="flex items-center justify-between mb-2">
-                <Badge className="bg-blue-900/50 text-blue-200 border-blue-700">Version 1</Badge>
+                <Badge className="bg-blue-900/50 text-blue-200 border-blue-700 text-xs">Version 1</Badge>
                 <span className="text-xs text-slate-500">14:10</span>
               </div>
-              <p className="text-sm text-slate-300">
-                Sample S-17: <Badge className="bg-slate-700 text-slate-200">White Label</Badge>
-              </p>
-              <p className="text-xs text-slate-500 mt-1">Created by: System (Initial)</p>
+              {comparedVersions.includes(1) ? (
+                <>
+                  <p className="text-sm text-slate-300">
+                    Sample S-17: <Badge className="bg-slate-700 text-slate-200 text-xs">White Label</Badge>
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Created by: System (Initial)</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine this version</p>
+              )}
             </div>
 
-            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            {/* Version 2 */}
+            <div 
+              className={`p-4 rounded-lg border transition-all cursor-pointer ${
+                selectedVersion === 2 
+                  ? 'bg-slate-800/70 border-amber-600 ring-2 ring-amber-600/50' 
+                  : comparedVersions.includes(2)
+                    ? 'bg-slate-800/50 border-slate-600'
+                    : 'bg-slate-800/30 border-slate-700 hover:border-amber-700/50'
+              }`}
+              onClick={() => selectVersion(2)}
+            >
               <div className="flex items-center justify-between mb-2">
-                <Badge className="bg-blue-900/50 text-blue-200 border-blue-700">Version 2</Badge>
+                <Badge className="bg-blue-900/50 text-blue-200 border-blue-700 text-xs">Version 2</Badge>
                 <span className="text-xs text-slate-500">14:14</span>
               </div>
-              <p className="text-sm text-slate-300">
-                Sample S-17: <Badge className="bg-slate-700 text-slate-200">White Label</Badge>
-              </p>
-              <p className="text-xs text-slate-500 mt-1">Modified by: R-05 (Riya)</p>
+              {comparedVersions.includes(2) ? (
+                <>
+                  <p className="text-sm text-slate-300">
+                    Sample S-17: <Badge className="bg-slate-700 text-slate-200 text-xs">White Label</Badge>
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Modified by: R-05 (Riya) - Tray marked ready</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine this version</p>
+              )}
             </div>
 
-            <div className="p-4 bg-amber-950/30 rounded-lg border-2 border-amber-700">
+            {/* Version 3 - Critical */}
+            <div 
+              className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                selectedVersion === 3 
+                  ? 'bg-amber-950/50 border-amber-500 ring-2 ring-amber-600/50' 
+                  : comparedVersions.includes(3)
+                    ? 'bg-amber-950/30 border-amber-700'
+                    : 'bg-slate-800/30 border-amber-800/50 hover:border-amber-700'
+              }`}
+              onClick={() => selectVersion(3)}
+            >
               <div className="flex items-center justify-between mb-2">
-                <Badge className="bg-amber-900/50 text-amber-200 border-amber-700">Version 3</Badge>
+                <Badge className="bg-amber-900/50 text-amber-200 border-amber-700 text-xs">Version 3</Badge>
                 <span className="text-xs text-amber-400 font-semibold">14:26</span>
               </div>
-              <p className="text-sm text-slate-300">
-                Sample S-17: <Badge className="bg-blue-900/50 text-blue-200">Blue Label</Badge> ⚠️
-              </p>
-              <p className="text-xs text-amber-400 mt-1 font-semibold">Modified by: K-02 (Kabir)</p>
+              {comparedVersions.includes(3) ? (
+                <>
+                  <p className="text-sm text-slate-300">
+                    Sample S-17: <Badge className="bg-blue-900/50 text-blue-200 text-xs">Blue Label</Badge> ⚠️
+                  </p>
+                  <p className="text-xs text-amber-400 mt-1 font-semibold">Modified by: K-02 (Kabir) - Label changed!</p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">Click to examine this version</p>
+              )}
             </div>
           </div>
 
-          <Alert className="bg-red-950/30 border-red-900/50">
-            <AlertCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-slate-300">
-              <strong className="text-red-300">Label Changed:</strong> Version 3 shows the label field was 
-              edited from white to blue at 14:26 by account K-02 (Kabir) — after cabinet access at 14:18.
-            </AlertDescription>
-          </Alert>
+          {comparedVersions.length === 3 && (
+            <>
+              <Alert className="bg-red-950/30 border-red-900/50 animate-in fade-in duration-500">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertDescription className="text-slate-300">
+                  <strong className="text-red-300">Critical Discovery:</strong> Version 3 shows the label field was 
+                  edited from WHITE to BLUE at 14:26 by account K-02 (Kabir) — 8 minutes after cabinet access at 14:18.
+                </AlertDescription>
+              </Alert>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 bg-slate-800/50 rounded border border-slate-700">
-              <h4 className="text-sm font-semibold text-amber-300 mb-2">Physical Evidence</h4>
-              <p className="text-xs text-slate-400">• Torn blue label fragment found</p>
-              <p className="text-xs text-slate-400">• Shoeprint matches Kabir's footwear</p>
-              <p className="text-xs text-slate-400">• Fingerprint: Inconclusive</p>
-            </div>
-            <div className="p-3 bg-amber-950/20 rounded border border-amber-900/50">
-              <h4 className="text-sm font-semibold text-amber-300 mb-2">Digital Evidence</h4>
-              <p className="text-xs text-slate-400">• K-02 accessed cabinet 14:18</p>
-              <p className="text-xs text-slate-400">• K-02 edited register 14:26</p>
-              <p className="text-xs text-slate-400">• K-02 = Kabir's account</p>
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-500">
+                <div className="p-3 bg-slate-800/50 rounded border border-slate-700">
+                  <h4 className="text-sm font-semibold text-amber-300 mb-2">🔍 Physical Evidence</h4>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-400">✓ Torn blue label fragment found</p>
+                    <p className="text-xs text-slate-400">✓ Shoeprint matches Kabir's footwear</p>
+                    <p className="text-xs text-slate-500">✗ Fingerprint: Inconclusive</p>
+                  </div>
+                </div>
+                <div className="p-3 bg-amber-950/20 rounded border border-amber-900/50">
+                  <h4 className="text-sm font-semibold text-amber-300 mb-2">💻 Digital Evidence</h4>
+                  <div className="space-y-1">
+                    <p className="text-xs text-amber-300">• K-02 accessed cabinet 14:18</p>
+                    <p className="text-xs text-amber-300">• K-02 edited register 14:26</p>
+                    <p className="text-xs text-amber-300 font-semibold">• K-02 = Kabir's account</p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -1073,9 +1136,10 @@ export default function ForensicMystery() {
         </Button>
         <Button 
           onClick={() => setCurrentScene('verdict')}
-          className="flex-1 bg-amber-700 hover:bg-amber-600"
+          disabled={comparedVersions.length < 3}
+          className="flex-1 bg-amber-700 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Make Final Accusation
+          {comparedVersions.length === 3 ? 'Make Final Accusation' : `Examine ${3 - comparedVersions.length} More Versions`}
         </Button>
       </div>
     </div>
@@ -1470,6 +1534,20 @@ export default function ForensicMystery() {
       if (sampleId === 'S-17') {
         addToNotebook('S-17 shows WHITE label physically, but BLUE in digital register');
         discoverEvidence('shoeprint');
+      }
+    }
+  };
+
+  const selectVersion = (versionNum: number) => {
+    setSelectedVersion(versionNum);
+    if (!comparedVersions.includes(versionNum)) {
+      setComparedVersions([...comparedVersions, versionNum]);
+      
+      // Check if all 3 versions examined
+      if (comparedVersions.length + 1 === 3) {
+        setDiscoveredRegisterEvidence(true);
+        addToNotebook('Register analysis complete: Kabir (K-02) changed label at 14:26');
+        discoverEvidence('register-history');
       }
     }
   };
