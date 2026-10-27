@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle, BookOpen, CheckCircle, Clock, FileText, Users, Trophy, Timer, Play, Lock, Code, ArrowUpDown, FileHistory, BarChart3, Target } from 'lucide-react';
+import { AlertCircle, BookOpen, CheckCircle, Clock, FileText, Users, Trophy, Timer, Play, Lock, Code, ArrowUpDown, History, BarChart3, Target } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -730,7 +730,7 @@ export default function ForensicMystery() {
   const renderRegister = () => (
     <div className="space-y-6 animate-in fade-in duration-700">
       <div className="flex items-center gap-2">
-        <FileHistory className="h-6 w-6 text-amber-500" />
+        <History className="h-6 w-6 text-amber-500" />
         <h2 className="text-2xl font-bold text-amber-100">Scene 6: The Record That Remembers</h2>
       </div>
 
